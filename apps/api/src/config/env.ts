@@ -43,9 +43,14 @@ export type Env = z.infer<typeof schema>;
 
 let cached: Env | undefined;
 
-export function env(): Env {
-  if (cached) return cached;
-  const parsed = schema.safeParse(process.env);
+/**
+ * Empty values count as unset. Docker Compose passes `VAR: ${VAR:-}` as an empty
+ * string, and an empty LLM_REWRITE_MODEL used to become a request for model "",
+ * which failed and silently fell back to the untranslated question.
+ */
+export function parseEnv(source: Record<string, string | undefined>): Env {
+  const defined = Object.fromEntries(Object.entries(source).filter(([, v]) => v !== undefined && v.trim() !== ''));
+  const parsed = schema.safeParse(defined);
   if (!parsed.success) {
     const issues = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
     throw new Error(`Invalid environment: ${issues}`);
@@ -53,7 +58,11 @@ export function env(): Env {
   if (parsed.data.NODE_ENV === 'production' && parsed.data.JWT_SECRET === DEV_JWT_SECRET) {
     throw new Error('JWT_SECRET must be set in production');
   }
-  cached = parsed.data;
+  return parsed.data;
+}
+
+export function env(): Env {
+  cached ??= parseEnv(process.env);
   return cached;
 }
 
