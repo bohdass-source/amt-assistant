@@ -1,0 +1,132 @@
+# Контрольные вопросы amt-assistant.
+#
+# answerable:    вопрос «засчитан», если среди источников ответа (или top-k поиска)
+#                есть хотя бы один документ из expected_documents.
+#                Критерий готовности: ≥ 16 из 20.
+# out_of_corpus: вопрос засчитан, если система отказалась отвечать. Должны пройти все.
+#
+# expected_documents — несколько допустимых документов: одни и те же правила
+# объясняются и в Merkblatt, и в Fachliche Weisungen.
+# Ожидания составлены по содержанию документов и проверяются прогоном
+# `npm run eval`; после первого прогона их стоит сверить вручную.
+
+answerable:
+  - id: q01-hoehe
+    lang: ru
+    question: "Сколько процентов от зарплаты составляет пособие по безработице?"
+    expected_documents: [ba-fw-149, ba-merkblatt-1-arbeitslose]
+
+  - id: q02-dauer-58
+    lang: ru
+    question: "Сколько месяцев платят Arbeitslosengeld, если мне 58 лет?"
+    expected_documents: [ba-fw-147, ba-merkblatt-1-arbeitslose]
+
+  - id: q03-sperrzeit-kuendigung
+    lang: ru
+    question: "Получу ли я пособие, если сам уволился с работы?"
+    expected_documents: [ba-fw-159, ba-merkblatt-1-arbeitslose]
+
+  - id: q04-meldeversaeumnis
+    lang: uk
+    question: "Що буде, якщо я не прийду на призначену зустріч в агентство з праці?"
+    expected_documents: [ba-fw-159, ba-merkblatt-1-arbeitslose, ba-merkblatt-arbeitsuche]
+
+  - id: q05-anwartschaft
+    lang: ru
+    question: "Сколько нужно проработать, чтобы получить право на пособие по безработице?"
+    expected_documents: [ba-fw-142, ba-merkblatt-1-arbeitslose]
+
+  - id: q06-meldung-frist
+    lang: uk
+    question: "Коли потрібно зареєструватися як шукач роботи, якщо мене звільняють?"
+    expected_documents: [ba-merkblatt-1-arbeitslose, ba-merkblatt-arbeitsuche]
+
+  - id: q07-nebeneinkommen
+    lang: ru
+    question: "Сколько можно зарабатывать подработкой, пока получаю пособие, чтобы его не урезали?"
+    expected_documents: [ba-fw-155, ba-merkblatt-1-arbeitslose]
+
+  - id: q08-15-stunden
+    lang: uk
+    question: "Скільки годин на тиждень можна працювати, щоб все ще вважатися безробітним?"
+    expected_documents: [ba-fw-138, ba-merkblatt-1-arbeitslose]
+
+  - id: q09-bemessung
+    lang: ru
+    question: "За какой период берут зарплату для расчёта суммы пособия?"
+    expected_documents: [ba-fw-150, ba-fw-151, ba-merkblatt-1-arbeitslose]
+
+  - id: q10-urlaubsabgeltung
+    lang: ru
+    question: "Что будет с пособием, если работодатель выплатил мне компенсацию за неиспользованный отпуск?"
+    expected_documents: [ba-fw-157, ba-merkblatt-1-arbeitslose]
+
+  - id: q11-krankengeld
+    lang: uk
+    question: "Чи виплачують допомогу з безробіття, якщо я отримую лікарняні (Krankengeld)?"
+    expected_documents: [ba-fw-156, ba-merkblatt-1-arbeitslose]
+
+  - id: q12-arbeitslosmeldung-online
+    lang: ru
+    question: "Можно ли встать на учёт как безработный онлайн или нужно прийти лично?"
+    expected_documents: [ba-fw-141, ba-merkblatt-1-arbeitslose]
+
+  - id: q13-bildungsgutschein
+    lang: ru
+    question: "Что такое Bildungsgutschein и как его получить?"
+    expected_documents: [ba-merkblatt-6-weiterbildung, ba-fw-fbw]
+
+  - id: q14-fahrkosten-kinder
+    lang: uk
+    question: "Чи оплачує агентство проїзд і догляд за дитиною під час навчання?"
+    expected_documents: [ba-merkblatt-6-weiterbildung, ba-fw-fbw]
+
+  - id: q15-praemie
+    lang: ru
+    question: "Есть ли денежная премия за успешно сданный экзамен во время переобучения?"
+    expected_documents: [ba-merkblatt-6-weiterbildung, ba-fw-fbw]
+
+  - id: q16-alg-bei-weiterbildung
+    lang: uk
+    question: "Чи отримую я допомогу з безробіття, поки навчаюся на курсах за Bildungsgutschein?"
+    expected_documents: [ba-merkblatt-6-weiterbildung, ba-fw-136, ba-merkblatt-1-arbeitslose]
+
+  - id: q17-azav
+    lang: ru
+    question: "Какие требования к курсу и учебному заведению, чтобы агентство оплатило обучение?"
+    expected_documents: [azav, ba-merkblatt-6-weiterbildung, ba-fw-fbw]
+
+  - id: q18-freiwillige-versicherung
+    lang: ru
+    question: "Может ли самозанятый добровольно застраховаться на случай безработицы?"
+    expected_documents: [ba-hinweise-versicherungspflicht-antrag, ba-merkblatt-1-arbeitslose]
+
+  - id: q19-ortsabwesenheit
+    lang: uk
+    question: "Чи потрібно повідомляти агентство, якщо я їду у відпустку, поки отримую допомогу?"
+    expected_documents: [ba-merkblatt-1-arbeitslose, ba-fw-138]
+
+  - id: q20-ohne-alg-pflichten
+    lang: ru
+    question: "Я ищу работу, но пособие не получаю. Какие у меня обязанности перед агентством?"
+    expected_documents: [ba-merkblatt-arbeitsuche]
+
+out_of_corpus:
+  - id: o01-kindergeld
+    lang: ru
+    question: "Как оформить Kindergeld на ребёнка?"
+  - id: o02-aufenthalt
+    lang: uk
+    question: "Як продовжити посвідку на проживання в Німеччині?"
+  - id: o03-wetter
+    lang: ru
+    question: "Какая завтра погода в Берлине?"
+  - id: o04-elterngeld
+    lang: ru
+    question: "Сколько составляет Elterngeld и где подать заявление?"
+  - id: o05-steuer
+    lang: uk
+    question: "Як подати податкову декларацію за минулий рік?"
+  - id: o06-deutschlandticket
+    lang: ru
+    question: "Сколько стоит Deutschlandticket?"

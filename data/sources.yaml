@@ -1,0 +1,218 @@
+# Корпус amt-assistant: одна тема — пособие по безработице (Arbeitslosengeld, SGB III)
+# и оплата профессионального обучения (Förderung der beruflichen Weiterbildung).
+#
+# date      — редакция документа (Stand / Gültig ab), как она указана в самом PDF.
+#             Показывается пользователю рядом с каждой ссылкой.
+# date_note — дословная формулировка даты из документа.
+# retrieved — когда адрес проверен и документ скачан.
+#
+# Адреса проверены 2026-11-15. Ведомство меняет имена файлов (суффикс _baNNNNNN)
+# при каждой новой редакции — если ingest падает с 404, найдите новую ссылку на
+# странице-источнике (page) и обновите url и date.
+
+topic: "Arbeitslosengeld und Förderung der beruflichen Weiterbildung (SGB III)"
+
+documents:
+  # ── Merkblätter: объяснения для граждан ──────────────────────────────────────
+  - id: ba-merkblatt-1-arbeitslose
+    title: "Merkblatt 1 für Arbeitslose – Ihre Rechte, Ihre Pflichten"
+    publisher: Bundesagentur für Arbeit
+    type: merkblatt
+    url: https://www.arbeitsagentur.de/datei/merkblatt-fuer-arbeitslose_ba036520.pdf
+    page: https://www.arbeitsagentur.de/arbeitslos-arbeit-finden/arbeitslosengeld
+    date: 2025-12-01
+    date_note: "Stand: Dezember 2025"
+    retrieved: 2026-11-15
+
+  - id: ba-merkblatt-6-weiterbildung
+    title: "Merkblatt 6 – Förderung der beruflichen Weiterbildung für Arbeitnehmerinnen und Arbeitnehmer"
+    publisher: Bundesagentur für Arbeit
+    type: merkblatt
+    url: https://www.arbeitsagentur.de/datei/merkblatt-6-weiterbildung_ba035860.pdf
+    page: https://www.arbeitsagentur.de/karriere-und-weiterbildung/bildungsgutschein
+    date: 2026-01-01
+    date_note: "Stand: Januar 2026"
+    retrieved: 2026-11-15
+
+  - id: ba-merkblatt-arbeitsuche
+    title: "Arbeitsuchende und Arbeitslose ohne Bezug von Arbeitslosengeld – Informationen über Rechte und Pflichten"
+    publisher: Bundesagentur für Arbeit
+    type: merkblatt
+    url: https://www.arbeitsagentur.de/datei/merkblatt-arbeitssuche_ba035940.pdf
+    page: https://www.arbeitsagentur.de/arbeitslos-arbeit-finden/arbeitslosengeld/das-muessen-sie-beachten
+    date: 2023-07-01
+    date_note: "Juli 2023"
+    retrieved: 2026-11-15
+
+  - id: ba-hinweise-versicherungspflicht-antrag
+    title: "Hinweise zum Versicherungspflichtverhältnis auf Antrag in der Arbeitslosenversicherung (§ 28a SGB III)"
+    publisher: Bundesagentur für Arbeit
+    type: merkblatt
+    url: https://www.arbeitsagentur.de/datei/hinweis-alv_ba035280.pdf
+    page: https://www.arbeitsagentur.de/karriere-und-weiterbildung/downloads-karriere-und-weiterbildung
+    date: 2026-01-01
+    date_note: "01.2026"
+    retrieved: 2026-11-15
+
+  # ── Fachliche Weisungen: внутренние инструкции ведомства (Weiterbildung) ──────
+  - id: ba-fw-fbw
+    title: "Fachliche Weisungen Förderung der beruflichen Weiterbildung (§§ 81–87a, 111a, 131a, 177, 180, 183 SGB III)"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/dok_ba031590.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2026-01-01
+    date_note: "Gültig ab: 01.01.2026"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-fbw-anlage
+    title: "Anlage Konstruktionsprinzipien zu den Fachlichen Weisungen FbW"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/anlage-zu-fw-fbw_ba044439.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2026-01-01
+    date_note: "Stand 01.01.2026"
+    retrieved: 2026-11-15
+
+  # ── Fachliche Weisungen: Arbeitslosengeld (§§ 136–159 SGB III) ───────────────
+  - id: ba-fw-136
+    title: "Fachliche Weisungen § 136 SGB III – Anspruch auf Arbeitslosengeld"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fw-sgb-iii-136_ba024320.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2016-07-20
+    date_note: "Gültig ab: 20.07.2016"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-137
+    title: "Fachliche Weisungen § 137 SGB III – Anspruchsvoraussetzungen bei Arbeitslosigkeit"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fw-sgb-iii-137_ba034365.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2026-10-23
+    date_note: "Gültig ab: 23.10.2026"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-138
+    title: "Fachliche Weisungen § 138 SGB III – Arbeitslosigkeit"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fw-sgb-iii-138_ba036000.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2026-10-23
+    date_note: "Gültig ab: 23.10.2026"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-141
+    title: "Fachliche Weisungen § 141 SGB III – Arbeitslosmeldung"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fw-sgb-iii-141_ba034405.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2024-06-21
+    date_note: "Gültig ab: 21.06.2024"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-142
+    title: "Fachliche Weisungen § 142 SGB III – Anwartschaftszeit"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fw-sgb-iii-142_ba028455.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2023-01-01
+    date_note: "Gültig ab: 01.01.2023"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-147
+    title: "Fachliche Weisungen § 147 SGB III – Anspruchsdauer (Grundsatz)"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fw-sgb-iii-147_ba028465.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2022-07-27
+    date_note: "Gültig ab: 27.07.2022"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-149
+    title: "Fachliche Weisungen § 149 SGB III – Höhe des Arbeitslosengeldes (Grundsatz)"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fw-sgb-iii-149_ba024265.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2016-12-20
+    date_note: "Gültig ab: 20.12.2016"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-150
+    title: "Fachliche Weisungen § 150 SGB III – Bemessungszeitraum und Bemessungsrahmen"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fw-sgb-iii-150_ba036020.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2025-06-27
+    date_note: "Gültig ab: 27.06.2025"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-151
+    title: "Fachliche Weisungen § 151 SGB III – Bemessungsentgelt"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fw-sgb-iii-151_ba036075.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2026-03-01
+    date_note: "Gültig ab: 01.03.2026"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-155
+    title: "Fachliche Weisungen § 155 SGB III – Anrechnung von Nebeneinkommen"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fachliche-weisung-sgb-iii-155-anrechnung-von-nebeneinkommen_ba042284.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2026-01-01
+    date_note: "Gültig ab: 01.01.2026"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-156
+    title: "Fachliche Weisungen § 156 SGB III – Ruhen des Anspruchs bei anderen Sozialleistungen"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fw-sgb-iii-156_ba036045.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2026-03-01
+    date_note: "Gültig ab: 01.03.2026"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-157
+    title: "Fachliche Weisungen § 157 SGB III – Ruhen des Anspruchs bei Arbeitsentgelt und Urlaubsabgeltung"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fw-sgb-iii-157_ba036040.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2026-03-01
+    date_note: "Gültig ab: 01.03.2026"
+    retrieved: 2026-11-15
+
+  - id: ba-fw-159
+    title: "Fachliche Weisungen § 159 SGB III – Ruhen bei Sperrzeit"
+    publisher: Bundesagentur für Arbeit
+    type: fachliche-weisung
+    url: https://www.arbeitsagentur.de/datei/fw-sgb-iii-159_ba034410.pdf
+    page: https://www.arbeitsagentur.de/ueber-uns/veroeffentlichungen/gesetze-und-weisungen/sgbiii-arbeitsfoerderung
+    date: 2026-07-01
+    date_note: "Gültig ab: 01.07.2026"
+    retrieved: 2026-11-15
+
+  # ── Verordnung: допуск курсов и учебных заведений ────────────────────────────
+  - id: azav
+    title: "Akkreditierungs- und Zulassungsverordnung Arbeitsförderung (AZAV)"
+    publisher: Bundesministerium der Justiz / gesetze-im-internet.de
+    type: verordnung
+    url: https://www.gesetze-im-internet.de/azav/AZAV.pdf
+    page: https://www.gesetze-im-internet.de/azav/
+    date: 2021-08-10
+    date_note: "Zuletzt geändert durch Art. 118 G v. 10.8.2021"
+    retrieved: 2026-11-15
