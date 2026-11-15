@@ -1,8 +1,9 @@
 'use client';
 
 import { Fragment, type ReactNode } from 'react';
+import { useLang } from '@/lib/i18n';
 
-/** Мини-рендер ответа: абзацы, списки, **жирный** и кликабельные сноски [n]. */
+/** Minimal answer renderer: paragraphs, lists, **bold** and clickable [n] footnotes. */
 export function AnswerText({
   text,
   citable,
@@ -12,13 +13,14 @@ export function AnswerText({
   citable: Set<number>;
   onCite: (n: number) => void;
 }) {
+  const { t } = useLang();
   const inline = (s: string, key: string): ReactNode[] =>
     s.split(/(\[\d+\]|\*\*[^*]+\*\*)/g).map((part, i) => {
       const cite = /^\[(\d+)\]$/.exec(part);
       if (cite) {
         const n = Number(cite[1]);
         return citable.has(n) ? (
-          <button key={`${key}-${i}`} type="button" className="cite" onClick={() => onCite(n)} aria-label={`Источник ${n}`}>
+          <button key={`${key}-${i}`} type="button" className="cite" onClick={() => onCite(n)} aria-label={`${t.citeLabel} ${n}`}>
             {n}
           </button>
         ) : (

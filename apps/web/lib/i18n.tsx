@@ -28,6 +28,7 @@ const STRINGS = {
       'Сколько можно подрабатывать, пока получаю пособие?',
     ],
     sources: 'Источники',
+    citeLabel: 'Источник',
     sourcesEmpty: 'Здесь появятся фрагменты документов, на которые опирается ответ.',
     page: 'стр.',
     version: 'редакция',
@@ -67,6 +68,7 @@ const STRINGS = {
       'Чи оплачує агентство проїзд під час навчання?',
     ],
     sources: 'Джерела',
+    citeLabel: 'Джерело',
     sourcesEmpty: 'Тут з’являться фрагменти документів, на які спирається відповідь.',
     page: 'с.',
     version: 'редакція',
@@ -102,7 +104,7 @@ export function LangProvider({ children }: { children: ReactNode }) {
       if (saved === 'ru' || saved === 'uk') setLangState(saved);
       else if (navigator.language.startsWith('uk')) setLangState('uk');
     } catch {
-      /* приватный режим — остаёмся на русском */
+      /* private mode: stay on Russian */
     }
   }, []);
 
