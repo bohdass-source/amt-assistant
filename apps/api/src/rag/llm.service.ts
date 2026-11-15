@@ -23,9 +23,9 @@ function contentToString(content: unknown): string {
 }
 
 /**
- * Генерация через llm-gateway. Гейтвей предполагается OpenAI-совместимым
- * (POST {LLM_BASE_URL}/chat/completions), поэтому тот же клиент работает и
- * с Ollama /v1 — так демо запускается без гейтвея.
+ * Generation through llm-gateway. The gateway is assumed to be OpenAI-compatible
+ * (POST {LLM_BASE_URL}/chat/completions), so the same client also works with
+ * Ollama /v1, which lets the demo run without a gateway.
  */
 @Injectable()
 export class LlmService {
@@ -38,7 +38,7 @@ export class LlmService {
       temperature,
       timeout: e.LLM_TIMEOUT_MS,
       maxRetries: 1,
-      // Передаётся в тело запроса как есть: Ollama /v1 и большинство гейтвеев понимают reasoning_effort.
+      // Sent in the request body as is: Ollama /v1 and most gateways understand reasoning_effort.
       modelKwargs: e.LLM_REASONING_EFFORT ? { reasoning_effort: e.LLM_REASONING_EFFORT } : undefined,
     });
   }

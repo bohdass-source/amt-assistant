@@ -1,6 +1,6 @@
 /**
- * Миграции хранятся в коде, чтобы tsc собирал их в dist без копирования .sql.
- * Применяются по порядку, каждая в своей транзакции.
+ * Migrations live in code so that tsc puts them into dist without copying .sql files.
+ * They run in order, each in its own transaction.
  */
 export const MIGRATIONS: { id: number; name: string; sql: string }[] = [
   {

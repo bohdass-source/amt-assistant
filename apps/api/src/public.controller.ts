@@ -21,7 +21,7 @@ export class PublicController {
     return { status: 'ok', db, chroma };
   }
 
-  /** Публичный список корпуса для страницы «Источники». */
+  /** Public list of the corpus for the Sources page. */
   @Get('documents')
   documents() {
     return this.db.query(

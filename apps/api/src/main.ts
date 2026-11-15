@@ -10,7 +10,7 @@ async function bootstrap() {
   const e = env();
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: false });
   app.setGlobalPrefix('api');
-  // За Caddy: req.ip — адрес клиента, нужен для rate limit.
+  // Behind Caddy: req.ip must be the client address for rate limiting.
   app.set('trust proxy', 1);
   app.useBodyParser('json', { limit: '64kb' });
   app.enableCors({ origin: e.CORS_ORIGIN.split(',').map((s) => s.trim()), credentials: false });

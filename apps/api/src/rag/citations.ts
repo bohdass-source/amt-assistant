@@ -1,13 +1,13 @@
 export const NO_ANSWER = 'NO_ANSWER';
 
 export interface CitationCheck {
-  /** Ответ, в котором оставлены только сноски на переданные фрагменты. */
+  /** The answer with only footnotes that point at excerpts given to the model. */
   text: string;
-  /** Номера фрагментов (с 1), на которые ответ реально ссылается. */
+  /** Excerpt numbers (from 1) the answer actually cites. */
   used: number[];
-  /** Номера, которых не было в контексте — модель их выдумала, они удалены. */
+  /** Numbers that were not in the context; the model invented them and they were removed. */
   invalid: number[];
-  /** Модель сама сообщила, что в контексте ответа нет. */
+  /** The model itself said the context has no answer. */
   noAnswer: boolean;
 }
 
@@ -18,8 +18,8 @@ export function stripThinking(text: string): string {
 }
 
 /**
- * Проверка сносок кодом, а не моделью: каждая [n] должна указывать на один из
- * фрагментов 1..fragmentCount, переданных в промпт. Чужие номера удаляются.
+ * Footnotes are checked by code, not by the model: every [n] must point at one of
+ * the excerpts 1..fragmentCount given in the prompt. Any other number is removed.
  */
 export function checkCitations(answer: string, fragmentCount: number): CitationCheck {
   const cleaned = stripThinking(answer).trim();
@@ -51,8 +51,8 @@ export function checkCitations(answer: string, fragmentCount: number): CitationC
 }
 
 /**
- * Убирает блоки <think>…</think> из потока токенов. Тег может прийти разрезанным
- * между чанками, поэтому хвост, похожий на начало тега, придерживается до следующего push.
+ * Removes <think>…</think> blocks from the token stream. A tag can be split across
+ * chunks, so a tail that looks like the start of a tag is held until the next push.
  */
 export class ThinkStreamFilter {
   private buf = '';

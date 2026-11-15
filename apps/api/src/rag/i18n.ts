@@ -9,9 +9,9 @@ const UK_WORDS = new Set(['чи', 'що', 'як', 'та', 'це', 'або', 'м�
 const RU_WORDS = new Set(['что', 'как', 'это', 'или', 'меня', 'мне', 'если', 'когда', 'могу', 'нужно', 'какой', 'какая', 'сколько', 'где', 'от', 'чтобы', 'ли']);
 
 /**
- * Буквы і ї є ґ есть только в украинском, ы э ё ъ — только в русском. Короткий
- * вопрос может не содержать ни тех, ни других («Чи можу я отримати допомогу?»),
- * поэтому считаем ещё частотные служебные слова. Ничья — подсказка модели, затем русский.
+ * The letters `і ї є ґ` occur only in Ukrainian, `ы э ё ъ` only in Russian. A short
+ * question may contain neither (`Чи можу я отримати допомогу?`), so frequent function
+ * words are counted too. On a tie: the model's hint, then Russian.
  */
 export function detectLang(text: string, hint?: string | null): Lang {
   const words = text.toLowerCase().match(/\p{L}+/gu) ?? [];
@@ -75,7 +75,7 @@ export function formatDate(iso: string): string {
   return `${d}.${m}.${y}`;
 }
 
-/** Пометка добавляется кодом к каждому ответу, включая отказы. */
+/** The disclaimer is added by code to every answer, refusals included. */
 export function buildFooter(lang: Lang, sources: FooterSource[]): string {
   const l = SOURCES_LABEL[lang];
   const byTitle = new Map<string, { pages: Set<number>; version: string }>();

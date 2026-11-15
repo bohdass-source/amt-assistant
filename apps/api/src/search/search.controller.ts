@@ -23,9 +23,9 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 /**
- * Поиск без генерации — для стенда rag-probe. Возвращает то же, что получает
- * генератор: перевод запроса, решение об отказе и слитый список фрагментов.
- * Контракт описан в docs/search-api.md.
+ * Retrieval without generation, for the rag-probe test bench. Returns what the
+ * generator would get: the rewritten query, the refusal decision and the fused excerpts.
+ * Contract: docs/search-api.md.
  */
 @Controller('search')
 export class SearchController {

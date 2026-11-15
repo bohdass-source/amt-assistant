@@ -14,7 +14,7 @@ interface PageProxy {
 
 const MAX_PDF_BYTES = 60 * 1024 * 1024;
 
-/** Текст постранично: pdf-parse вызывает pagerender для каждой страницы по порядку. */
+/** Text per page: pdf-parse calls pagerender for each page in order. */
 export async function extractPages(data: Buffer): Promise<PageText[]> {
   const pages: PageText[] = [];
   await pdfParse(data, {

@@ -12,18 +12,18 @@ const schema = z.object({
   CHROMA_URL: z.string().url().default('http://localhost:8000'),
   CHROMA_COLLECTION: z.string().default('amt_chunks'),
 
-  // Embeddings: мультиязычная модель через Ollama.
+  // Embeddings: a multilingual model served by Ollama.
   OLLAMA_URL: z.string().url().default('http://localhost:11434'),
   EMBEDDING_MODEL: z.string().default('bge-m3'),
 
-  // Генерация: OpenAI-совместимый llm-gateway. Без гейтвея — Ollama /v1.
+  // Generation: an OpenAI-compatible llm-gateway. Without a gateway, Ollama /v1.
   LLM_BASE_URL: z.string().url().default('http://localhost:11434/v1'),
   LLM_API_KEY: z.string().default('ollama'),
   LLM_MODEL: z.string().default('qwen3.5:9b'),
   LLM_REWRITE_MODEL: z.string().optional(),
   LLM_TIMEOUT_MS: z.coerce.number().int().default(120_000),
-  // Для «думающих» моделей (qwen3.x и т. п.): none отключает размышления —
-  // в демо на qwen3.5:9b это 1 с вместо ~200 с на перевод вопроса.
+  // For reasoning models (qwen3.x and similar), `none` turns reasoning off:
+  // with qwen3.5:9b the query rewrite takes ~1 s instead of ~200 s.
   LLM_REASONING_EFFORT: z.enum(['none', 'low', 'medium', 'high']).optional(),
 
   JWT_SECRET: z.string().min(16).default(DEV_JWT_SECRET),
@@ -35,7 +35,7 @@ const schema = z.object({
 
   RETRIEVAL_K: z.coerce.number().int().min(1).max(100).default(20),
   CONTEXT_CHUNKS: z.coerce.number().int().min(1).max(20).default(6),
-  // Порог отказа: косинусное сходство лучшего векторного совпадения.
+  // Refusal threshold: cosine similarity of the best vector match.
   MIN_VECTOR_SIMILARITY: z.coerce.number().min(0).max(1).default(0.45),
 });
 
@@ -57,7 +57,7 @@ export function env(): Env {
   return cached;
 }
 
-/** BullMQ принимает параметры ioredis, а не URL — разбираем REDIS_URL сами. */
+/** BullMQ takes ioredis options rather than a URL, so REDIS_URL is parsed here. */
 export function redisConnection(url: string) {
   const u = new URL(url);
   return {

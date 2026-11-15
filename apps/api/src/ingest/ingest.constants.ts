@@ -2,7 +2,7 @@ export const INGEST_QUEUE = 'ingest';
 
 export interface IngestJob {
   documentId: string;
-  /** true — пересчитать даже если хеш PDF не изменился. */
+  /** true: re-index even if the PDF hash has not changed. */
   force?: boolean;
 }
 
@@ -15,5 +15,5 @@ export interface IngestOutcome {
   sha256: string;
 }
 
-/** Один jobId на документ: пока задача в очереди или в работе, повторный add игнорируется. */
+/** One jobId per document: while a job is waiting or active, another add is ignored. */
 export const ingestJobId = (documentId: string) => `ingest-${documentId}`;

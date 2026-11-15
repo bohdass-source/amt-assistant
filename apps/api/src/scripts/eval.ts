@@ -1,12 +1,12 @@
 /**
- * Прогон контрольных вопросов против работающего API.
+ * Runs the control questions against a running API.
  *
- *   npm run eval -- --mode=search            # только поиск: верный документ в top-k
- *   npm run eval -- --mode=answer            # полный ответ: верный документ среди сносок
+ *   npm run eval -- --mode=search            # retrieval only: expected document in top-k
+ *   npm run eval -- --mode=answer            # full answer: expected document among the footnotes
  *   npm run eval -- --api=https://amt.example.org --k=3 --out=../../reports/eval.json
  *
- * Код выхода 1, если верных источников меньше --min (по умолчанию 16)
- * или хотя бы один вопрос вне корпуса не получил отказ.
+ * Exits with 1 if fewer than --min questions (default 16) get the expected source,
+ * or if any out-of-corpus question is not refused.
  */
 import '../load-env';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -136,8 +136,8 @@ async function main() {
   const refusals = ooc.filter((o) => o.pass).length;
   const ok = hits >= MIN && refusals === ooc.length;
 
-  console.log(`\nВерный источник: ${hits}/${answerable.length} (нужно ≥ ${MIN})`);
-  console.log(`Отказ вне корпуса: ${refusals}/${ooc.length} (нужно все)`);
+  console.log(`\nExpected source: ${hits}/${answerable.length} (need ≥ ${MIN})`);
+  console.log(`Out-of-corpus refused: ${refusals}/${ooc.length} (need all)`);
   console.log(ok ? 'PASS' : 'FAIL');
 
   if (args.out) {

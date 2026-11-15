@@ -10,11 +10,11 @@ export interface RewriteResult {
   lang: Lang;
   inScope: boolean;
   queryDe: string;
-  /** false — модель не ответила или вернула мусор, использован исходный вопрос. */
+  /** false: the model failed or returned garbage, so the original question was used. */
   rewritten: boolean;
 }
 
-// Для вопроса вне темы модель часто оставляет query_de пустым — это валидный ответ, а не мусор.
+// For an out-of-scope question the model often leaves query_de empty; that is a valid reply, not garbage.
 const rewriteSchema = z
   .object({
     lang: z.string().optional(),
@@ -65,7 +65,7 @@ export class QueryRewriterService {
       if (signal?.aborted) throw err;
       this.log.warn(`Rewrite failed, falling back to original question: ${(err as Error).message}`);
     }
-    // Без перевода: bge-m3 мультиязычный, векторный поиск всё ещё работает.
+    // No translation: bge-m3 is multilingual, so vector search still works.
     return { lang: detectLang(question), inScope: true, queryDe: question, rewritten: false };
   }
 }

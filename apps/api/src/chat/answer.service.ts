@@ -92,7 +92,7 @@ export class AnswerService {
       text: h.text,
     }));
 
-    // Первые символы придерживаем: если модель отвечает NO_ANSWER, пользователь не увидит маркер.
+    // Hold back the first characters: if the model replies NO_ANSWER, the user never sees the marker.
     const filter = new ThinkStreamFilter();
     let raw = '';
     let pending = '';
@@ -109,8 +109,8 @@ export class AnswerService {
       }
     };
 
-    // Историю в генерацию не передаём: в старых ответах есть сноски [n] на другие
-    // фрагменты, и модель путает нумерацию. Контекст диалога уже учтён в query_de.
+    // History is not passed to generation: earlier answers contain [n] footnotes that
+    // point at other excerpts and confuse the numbering. Dialogue context is already in query_de.
     const question = r.rewritten ? `${input.message}\n\n(Standalone question in German: ${r.queryDe})` : input.message;
     for await (const token of this.llm.stream(
       [

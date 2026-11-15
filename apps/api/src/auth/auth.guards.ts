@@ -36,7 +36,7 @@ export const CurrentUser = createParamDecorator((_data: unknown, ctx: ExecutionC
   return user;
 });
 
-/** Проверяет Bearer-токен и, если на хендлере есть @Roles, роль пользователя. */
+/** Verifies the Bearer token and, if the handler has @Roles, the user's role. */
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(

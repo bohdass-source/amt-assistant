@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { env } from '../config/env';
 import { loadSources, Source, SourcesFile } from './sources';
 
-/** Список документов перечитывается при каждом обращении: правка YAML не требует перезапуска. */
+/** The list is re-read on every call, so editing the YAML needs no restart. */
 @Injectable()
 export class SourcesService {
   file(): SourcesFile {

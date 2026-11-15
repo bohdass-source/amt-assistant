@@ -14,7 +14,7 @@ export interface Hit {
   chunkId: string;
   documentId: string;
   title: string;
-  /** Прямая ссылка на страницу: браузерный просмотрщик PDF понимает #page=N. */
+  /** Direct link to the page: browser PDF viewers understand #page=N. */
   url: string;
   page: number;
   section: string | null;
@@ -45,7 +45,7 @@ export interface RetrieveOptions {
   history?: HistoryTurn[];
   k?: number;
   limit?: number;
-  /** false — без LLM-перевода: запрос идёт в поиск как есть (детерминированно для стенда). */
+  /** false: no LLM rewrite, the query is searched as is (deterministic for the test bench). */
   translate?: boolean;
   signal?: AbortSignal;
 }
@@ -105,7 +105,7 @@ export class RetrievalService {
     const hits: Hit[] = [];
     for (const f of fused) {
       const r = byId.get(f.id);
-      if (!r) continue; // вектор есть, а строки уже нет (документ переиндексируется)
+      if (!r) continue; // vector exists but the row is gone (document is being re-indexed)
       hits.push({
         rank: hits.length + 1,
         chunkId: r.id,

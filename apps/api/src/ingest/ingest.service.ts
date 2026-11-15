@@ -19,7 +19,7 @@ export class IngestService {
 
     const existing = await this.queue.getJob(ingestJobId(documentId));
     if (existing && !(await existing.isCompleted()) && !(await existing.isFailed())) {
-      return { documentId, queued: false }; // уже в очереди или обрабатывается
+      return { documentId, queued: false }; // already waiting or being processed
     }
     if (existing) await existing.remove();
 

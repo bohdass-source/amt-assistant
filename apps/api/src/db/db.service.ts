@@ -41,7 +41,7 @@ export class DbService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  /** API и worker стартуют одновременно — advisory lock не даёт применить миграцию дважды. */
+  /** API and worker start at the same time; an advisory lock keeps a migration from running twice. */
   private async migrate() {
     await this.tx(async (c) => {
       await c.query('SELECT pg_advisory_xact_lock(727274)');

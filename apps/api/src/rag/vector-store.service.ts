@@ -13,7 +13,7 @@ export interface VectorRecord {
 
 export interface VectorHit {
   id: string;
-  /** 1 − косинусное расстояние; коллекция создаётся с space=cosine. */
+  /** 1 − cosine distance; the collection is created with space=cosine. */
   similarity: number;
 }
 
@@ -34,7 +34,7 @@ export class VectorStoreService {
       this.collection = this.client
         .getOrCreateCollection({
           name: env().CHROMA_COLLECTION,
-          // Эмбеддинги считаем сами через Ollama — встроенная функция Chroma не нужна.
+          // Embeddings are computed via Ollama, so Chroma's built-in function is not needed.
           embeddingFunction: null,
           configuration: { hnsw: { space: 'cosine' } },
           metadata: { embedding_model: env().EMBEDDING_MODEL },
@@ -54,7 +54,7 @@ export class VectorStoreService {
     return this.collection;
   }
 
-  /** Сначала удаляем все векторы документа, потом пишем новые — повторный ingest не плодит дубликаты. */
+  /** Delete all vectors of the document first, then write the new ones, so re-ingest leaves no duplicates. */
   async replaceDocument(documentId: string, records: VectorRecord[]): Promise<void> {
     const c = await this.col();
     await c.delete({ where: { document_id: documentId } });

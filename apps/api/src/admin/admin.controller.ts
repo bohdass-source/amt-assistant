@@ -20,7 +20,7 @@ export class AdminController {
     private readonly ingest: IngestService,
   ) {}
 
-  /** Документы из sources.yaml вместе со статусом ingest; ещё не загруженные — pending. */
+  /** Documents from sources.yaml with their ingest status; those never ingested are `pending`. */
   @Get('documents')
   async list() {
     const rows = new Map((await this.documents.list()).map((d) => [d.id, d]));

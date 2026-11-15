@@ -1,13 +1,13 @@
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 
 export interface PageText {
-  /** Номер страницы в PDF-файле, с 1. По нему строится ссылка url#page=N. */
+  /** Page number in the PDF file, starting at 1. Used for the url#page=N link. */
   page: number;
   text: string;
 }
 
 export interface ChunkDraft {
-  /** Читаемый и стабильный id: `<documentId>#p<page>-<n>` — удобно для qrels в rag-probe. */
+  /** Readable, stable id `<documentId>#p<page>-<n>`, convenient for rag-probe qrels. */
   id: string;
   documentId: string;
   page: number;
@@ -19,9 +19,9 @@ export interface ChunkDraft {
 export interface ChunkOptions {
   chunkSize: number;
   chunkOverlap: number;
-  /** Сегмент короче этого склеивается со следующим на той же странице. */
+  /** A segment shorter than this is merged with the next one on the same page. */
   minSegment: number;
-  /** Сегменты короче этого после склейки отбрасываются как шум. */
+  /** Segments still shorter than this after merging are dropped as noise. */
   minChunk: number;
 }
 
@@ -33,11 +33,11 @@ export const DEFAULT_CHUNK_OPTIONS: ChunkOptions = {
 };
 
 const HEADING_PATTERNS: RegExp[] = [
-  // § 138 SGB III / § 159 Ruhen bei Sperrzeit — но не «§ 37 Abs. 2 SGB X; wird …» из текста
+  // § 138 SGB III / § 159 Ruhen bei Sperrzeit, but not "§ 37 Abs. 2 SGB X; wird …" from running text
   /^§\s?\d+[a-z]?\s+SGB\s+[IVX]+$/u,
   /^§\s?\d+[a-z]?\s+(SGB\s+[IVX]+\s+)?\p{Lu}[\p{L}\- ]{2,60}$/u,
-  // 2. Antrag stellen / 2.3 Anspruchsdauer / 4.1.2 Fahrkosten — точка обязательна,
-  // иначе «5 Jahre verlängert …» из середины абзаца считается заголовком
+  // 2. Antrag stellen / 2.3 Anspruchsdauer / 4.1.2 Fahrkosten: the dot is required,
+  // otherwise "5 Jahre verlängert …" in the middle of a paragraph looks like a heading
   /^\d{1,2}\.(\d{1,2}\.?){0,4}\s+\p{Lu}[\p{L}\p{N}\-–,/()§? ]{2,}$/u,
   // Kapitel 3 / Anlage 1 - Rechtsfolgenbelehrung / Teil B
   /^(Teil|Kapitel|Abschnitt|Anlage|Anhang)\s+[\dIVXA-Z]+\b/u,
@@ -46,16 +46,16 @@ const HEADING_PATTERNS: RegExp[] = [
 ];
 
 const PAGE_NUMBER_LINE = /^(seite\s*)?\d{1,3}(\s*(von|\/)\s*\d{1,3})?$/i;
-// «Anlage 1 Seite 24 (07/2026) § 159», «BA Zentrale, GR3 Seite 1 von 4» — колонтитулы
+// "Anlage 1 Seite 24 (07/2026) § 159", "BA Zentrale, GR3 Seite 1 von 4": running headers and footers
 const PAGE_FURNITURE = /^.{0,50}\bSeite\s+\d+(\s+von\s+\d+)?\b.{0,40}$/i;
-// строки оглавления: точки-заполнители или номер страницы в конце
+// table-of-contents lines: dot leaders or a trailing page number
 const TOC_LINE = /(\.{4,}|…{2,})\s*\d*$|\s\d{1,3}$/;
 
 export function normalizeText(raw: string): string {
   return (
     raw
       .replace(/\r/g, '')
-      // мягкий перенос (U+00AD) вместе с разрывом строки после него
+      // soft hyphen (U+00AD) together with the line break after it
       .replace(/­\n?/g, '')
       .replace(/[ \t ]+/g, ' ')
       // Silbentrennung: "Arbeits-\nlosengeld" → "Arbeitslosengeld"
@@ -70,18 +70,18 @@ export function normalizeText(raw: string): string {
 
 export function isHeading(line: string): boolean {
   if (line.length < 3 || line.length > 120) return false;
-  // предложения заканчиваются знаком препинания — это не заголовки
+  // sentences end with punctuation; those are not headings
   if (/[.:;,]$/.test(line)) return false;
   if (TOC_LINE.test(line)) return false;
   return HEADING_PATTERNS.some((p) => p.test(line));
 }
 
-/** Ключ строки без цифр: «Seite 3 von 72» и «Seite 4 von 72» дают один ключ. */
+/** Line key without digits: "Seite 3 von 72" and "Seite 4 von 72" give the same key. */
 function boilerKey(line: string): string {
   return line.toLowerCase().replace(/\d+/g, '#').replace(/\s+/g, ' ').trim();
 }
 
-/** Колонтитулы — строки, которые повторяются на большинстве страниц. */
+/** Running headers/footers are lines that repeat on most pages. */
 export function detectBoilerplate(pages: PageText[], minShare = 0.4): Set<string> {
   if (pages.length < 4) return new Set();
   const counts = new Map<string, number>();
@@ -101,9 +101,9 @@ interface Segment {
 const textOf = (s: Segment) => s.lines.join('\n');
 
 /**
- * Чанкинг по разделам: заголовки (§, нумерация, «Anlage…») открывают новый раздел,
- * раздел продолжается через границу страницы, но фрагмент никогда не пересекает
- * страницу — иначе ссылка на страницу была бы неточной.
+ * Section-aware chunking: headings (§, numbering, "Anlage…") open a new section.
+ * A section continues across a page break, but a chunk never crosses a page,
+ * otherwise the page reference would be wrong.
  */
 export async function chunkPages(
   documentId: string,
@@ -139,7 +139,7 @@ export async function chunkPages(
     }
     if (current.lines.length) segments.push(current);
 
-    // Короткий сегмент (часто один заголовок) приклеиваем к следующему.
+    // A short segment (often a lone heading) is merged into the next one.
     const merged: Segment[] = [];
     for (const s of segments) {
       const prev = merged[merged.length - 1];
@@ -173,7 +173,7 @@ export async function chunkPages(
   return out;
 }
 
-/** Текст для эмбеддинга: заголовок документа и раздела дают фрагменту контекст. */
+/** Text to embed: the document and section titles give the chunk context. */
 export function embeddingText(title: string, chunk: Pick<ChunkDraft, 'section' | 'text'>): string {
   return [title, chunk.section, chunk.text].filter(Boolean).join('\n');
 }

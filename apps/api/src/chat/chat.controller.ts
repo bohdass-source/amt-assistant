@@ -27,7 +27,7 @@ export class ChatController {
     private readonly conversations: ConversationsService,
   ) {}
 
-  /** Server-Sent Events поверх POST: meta → sources → token… → done (или error). */
+  /** Server-Sent Events over POST: meta → sources → token… → done (or error). */
   @Post('chat')
   @Throttle({ default: { limit: 12, ttl: 60_000 } })
   async chat(

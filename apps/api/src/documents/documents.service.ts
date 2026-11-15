@@ -25,7 +25,7 @@ export interface DocumentRow {
 export class DocumentsService {
   constructor(private readonly db: DbService) {}
 
-  /** Метаданные всегда берутся из sources.yaml; статус и хеш — из последнего ingest. */
+  /** Metadata always comes from sources.yaml; status and hash come from the last ingest. */
   async upsertFromSource(s: Source): Promise<void> {
     await this.db.query(
       `INSERT INTO documents (id, title, url, publisher, doc_type, doc_date, date_note)

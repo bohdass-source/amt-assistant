@@ -7,10 +7,10 @@ export interface KeywordHit {
 }
 
 /**
- * websearch_to_tsquery по умолчанию соединяет слова через AND — для длинного
- * вопроса это почти всегда пустой результат. Соединяем термины через OR,
- * а ранжирование оставляем ts_rank_cd. Синтаксис websearch не бросает ошибок
- * на произвольном вводе, поэтому SQL-инъекции и падения парсера исключены.
+ * websearch_to_tsquery joins words with AND by default, which for a long question
+ * almost always matches nothing. Terms are joined with OR instead and ranking is
+ * left to ts_rank_cd. The websearch syntax never throws on arbitrary input, and the
+ * query is passed as a bind parameter, so neither injection nor parser errors are possible.
  */
 export function toOrQuery(query: string, maxTerms = 24): string {
   const terms = query.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? [];

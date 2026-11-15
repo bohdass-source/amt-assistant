@@ -27,7 +27,7 @@ export class AuthService implements OnApplicationBootstrap {
     private readonly jwt: JwtService,
   ) {}
 
-  /** Администратор создаётся из ADMIN_EMAIL / ADMIN_PASSWORD; пароль в env обновляет хеш. */
+  /** The admin is created from ADMIN_EMAIL / ADMIN_PASSWORD; changing the password in env updates the hash. */
   async onApplicationBootstrap() {
     const { ADMIN_EMAIL, ADMIN_PASSWORD } = env();
     if (!ADMIN_PASSWORD) {
@@ -42,7 +42,7 @@ export class AuthService implements OnApplicationBootstrap {
     );
   }
 
-  /** Публичный сайт: гость получает анонимную учётную запись, чтобы работали история и оценки. */
+  /** Public site: a visitor gets an anonymous guest account so that history and ratings work. */
   async guest(): Promise<SessionResponse> {
     const row = await this.db.one<UserRow>(`INSERT INTO users (is_guest) VALUES (true) RETURNING *`);
     return this.session(row!);

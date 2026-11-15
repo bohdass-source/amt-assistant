@@ -35,7 +35,7 @@ export class IngestProcessor extends WorkerHost {
     const pdf = await downloadPdf(source.url);
     const sha256 = createHash('sha256').update(pdf).digest('hex');
 
-    // Защита от повторной загрузки: тот же файл уже проиндексирован — ничего не делаем.
+    // Re-ingest guard: the same file is already indexed, nothing to do.
     if (!force && previous?.status === 'ready' && previous.sha256 === sha256) {
       await this.documents.setStatus(documentId, 'ready');
       this.log.log(`${documentId}: unchanged (${sha256.slice(0, 12)}), skipped`);
