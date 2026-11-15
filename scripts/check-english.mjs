@@ -24,6 +24,7 @@ const CONTENT_FILES = [
   /^apps\/web\/app\/(layout|admin\/page|sources\/page)\.tsx$/, // page titles and meta description
   /^data\/eval\/questions\.yaml$/, // control questions as users would type them
   /\.test\.ts$/, // test fixtures
+  /^apps\/api\/test\/offline\/fakes\.ts$/, // fixtures shared by the offline tests
 ];
 
 /** Not checked yet; each entry must name the change that removes it. */
