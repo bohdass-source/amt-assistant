@@ -1,8 +1,6 @@
 # DOMAIN=localhost → Caddy issues a local certificate (demo).
 # DOMAIN=amt.example.org → automatic Let's Encrypt (the A record must point at the server).
-{
-	email {$ACME_EMAIL:admin@localhost}
-}
+# No ACME contact email: Let's Encrypt issues certificates without one.
 
 {$DOMAIN:localhost} {
 	header {
