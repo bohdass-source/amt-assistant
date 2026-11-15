@@ -17,7 +17,9 @@
     "build": "npm run build -w apps/api && npm run build -w apps/web",
     "typecheck": "npm run typecheck -w apps/api && npm run typecheck -w apps/web",
     "test:offline": "npm run test:offline -w apps/api",
-    "check:english": "node scripts/check-english.mjs"
+    "check:english": "node scripts/check-english.mjs",
+    "live:search": "npm run live:search -w apps/api --",
+    "live:answer": "npm run live:answer -w apps/api --"
   },
   "engines": {
     "node": ">=22"

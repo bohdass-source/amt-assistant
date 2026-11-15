@@ -6,7 +6,9 @@ dist/
 .env.*
 !.env.example
 coverage/
-reports/
+# Live check reports are committed; anything else under reports/ is scratch.
+reports/*
+!reports/live/
 .DS_Store
 *.log
 __pycache__/

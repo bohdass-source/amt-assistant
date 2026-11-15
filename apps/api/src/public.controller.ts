@@ -1,5 +1,6 @@
 import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
+import { env } from './config/env';
 import { DbService } from './db/db.service';
 import { VectorStoreService } from './rag/vector-store.service';
 
@@ -18,7 +19,20 @@ export class PublicController {
       this.vectors.heartbeat(),
     ]);
     if (!db || !chroma) throw new ServiceUnavailableException({ db, chroma });
-    return { status: 'ok', db, chroma };
+    const [index] = await this.db.query<{ documents: number; chunks: number }>(
+      `SELECT (SELECT count(*) FROM documents WHERE status = 'ready')::int AS documents,
+              (SELECT count(*) FROM chunks)::int AS chunks`,
+    );
+    const e = env();
+    // Model names and the index size let a live check record what it actually ran against.
+    return {
+      status: 'ok',
+      db,
+      chroma,
+      index,
+      models: { embedding: e.EMBEDDING_MODEL, answer: e.LLM_MODEL, rewrite: e.LLM_REWRITE_MODEL ?? e.LLM_MODEL },
+      minVectorSimilarity: e.MIN_VECTOR_SIMILARITY,
+    };
   }
 
   /** Public list of the corpus for the Sources page. */

@@ -9,7 +9,8 @@
 # expected_documents lists several acceptable documents, because the same rule is
 # explained both in a Merkblatt and in the Fachliche Weisungen.
 # The expectations were written from the documents' content, not by a lawyer, and
-# are checked by `npm run eval`. They should be reviewed by hand.
+# are checked by the live checks (`npm run live:search`, `npm run live:answer`).
+# They should be reviewed by hand.
 
 answerable:
   - id: q01-hoehe
