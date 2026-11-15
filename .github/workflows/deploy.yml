@@ -1,0 +1,42 @@
+name: Deploy
+
+# Ручной запуск после зелёного CI. Сервер: Docker + compose, репозиторий
+# склонирован в DEPLOY_PATH, рядом лежит заполненный .env.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy over SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/opt/amt-assistant' }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy && chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_deploy "$USER@$HOST" "set -e; cd '$DEPLOY_PATH' && git fetch --quiet origin main && git reset --hard origin/main && docker compose up -d --build --remove-orphans && docker image prune -f"
+      - name: Smoke check
+        env:
+          DOMAIN: ${{ vars.DOMAIN }}
+        if: ${{ vars.DOMAIN != '' }}
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS "https://$DOMAIN/api/health"; then exit 0; fi
+            sleep 10
+          done
+          exit 1
