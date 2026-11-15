@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.next/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+coverage/
+reports/
+.DS_Store
+*.log
+__pycache__/
+*.pyc
