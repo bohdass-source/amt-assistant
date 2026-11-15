@@ -1,13 +1,13 @@
-# `POST /api/search` — поиск без генерации
+# `POST /api/search`: retrieval without generation
 
-Эндпоинт для стенда rag-probe и любых внешних оценщиков. Возвращает ровно то, что
-получил бы генератор ответа: перевод вопроса на немецкий, решение об отказе и
-слитый (RRF) список фрагментов. LLM для ответа не вызывается.
+Endpoint for the rag-probe test bench and any external evaluator. It returns exactly
+what the answer generator would receive: the German rewrite of the question, the
+refusal decision and the fused (RRF) list of excerpts. No LLM is called to answer.
 
-Если в окружении задан `SEARCH_API_KEY`, нужен заголовок `x-api-key`.
-Лимит: 60 запросов в минуту с одного IP.
+If `SEARCH_API_KEY` is set, the `x-api-key` header is required.
+Rate limit: 60 requests per minute per IP.
 
-## Запрос
+## Request
 
 ```json
 {
@@ -21,14 +21,14 @@
 }
 ```
 
-| поле        | тип     | по умолчанию | смысл                                                                                       |
-|-------------|---------|--------------|---------------------------------------------------------------------------------------------|
-| `query`     | string  | —            | вопрос на русском, украинском или немецком (2–2000 символов)                               |
-| `k`         | int     | 10           | сколько фрагментов вернуть (1–50); каждый ретривер всегда достаёт ≥ 20 кандидатов          |
-| `translate` | bool    | true         | `false` — без LLM-перевода и проверки темы: детерминированный прогон только ретривера       |
-| `history`   | array   | []           | предыдущие реплики для разрешения ссылок («а если мне 58?»)                                 |
+| field       | type    | default | meaning                                                                                    |
+|-------------|---------|---------|--------------------------------------------------------------------------------------------|
+| `query`     | string  | —       | question in Russian, Ukrainian or German (2–2000 characters)                              |
+| `k`         | int     | 10      | number of excerpts to return (1–50); each retriever always fetches at least 20 candidates |
+| `translate` | bool    | true    | `false` skips the LLM rewrite and topic check: a deterministic retriever-only run          |
+| `history`   | array   | []      | previous turns, used to resolve follow-ups such as "and if I am 58?"                       |
 
-## Ответ
+## Response
 
 ```json
 {
@@ -61,10 +61,11 @@
 }
 ```
 
-- `chunk_id` стабилен между переиндексациями, пока не меняется PDF: `<document_id>#p<страница>-<n>`.
-  Его можно использовать в qrels.
-- `page` — номер страницы **в PDF-файле** (с 1), а не напечатанный на листе.
-- `refused` и `refusal_reason` (`out_of_scope`, `low_similarity`, `empty_index`) — то же
-  решение, которое чат принимает до генерации. Отказы самой модели (`no_answer_in_context`,
-  `no_valid_citations`) видны только в чате.
-- `vector_rank` / `keyword_rank` — ранги в исходных списках (Chroma и PostgreSQL FTS) или `null`.
+- `chunk_id` is stable across re-indexing as long as the PDF does not change:
+  `<document_id>#p<page>-<n>`. It can be used in qrels.
+- `page` is the page number **in the PDF file** (from 1), not the number printed on the sheet.
+- `refused` and `refusal_reason` (`out_of_scope`, `low_similarity`, `empty_index`) are the same
+  decision the chat makes before generation. Refusals by the model itself
+  (`no_answer_in_context`, `no_valid_citations`) are visible only in the chat.
+- `vector_rank` / `keyword_rank` are the ranks in the input lists (Chroma and PostgreSQL FTS),
+  or `null`.

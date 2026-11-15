@@ -1,18 +1,18 @@
-"""HTTP-адаптер amt-assistant для стенда rag-probe.
+"""HTTP adapter for amt-assistant in the rag-probe test bench.
 
-Только стандартная библиотека Python 3.10+. Адаптер оборачивает два эндпоинта:
+Python 3.10+ standard library only. The adapter wraps two endpoints:
 
-* ``retrieve`` → ``POST /api/search`` — поиск без генерации (основной режим стенда);
-* ``answer``   → ``POST /api/chat``   — полный ответ со сносками (SSE, гостевой токен).
+* ``retrieve`` → ``POST /api/search`` — retrieval without generation (the bench's main mode);
+* ``answer``   → ``POST /api/chat``   — the full answer with footnotes (SSE, guest token).
 
-Интерфейс адаптера rag-probe здесь не импортируется: класс отдаёт простые словари,
-и тонкая обёртка под конкретный базовый класс стенда занимает несколько строк
-(см. README рядом).
+The rag-probe adapter interface is not imported here: the class returns plain
+dicts, and a thin wrapper for the bench's base class takes a few lines (see the
+README next to this file).
 
-Пример::
+Example::
 
     adapter = AmtAssistantAdapter("https://amt.example.org", api_key=os.getenv("SEARCH_API_KEY"))
-    hits = adapter.retrieve("Получу ли я пособие, если сам уволился?", k=5)
+    hits = adapter.retrieve("Bekomme ich Arbeitslosengeld nach Eigenkündigung?", k=5)
     print(hits[0]["document_id"], hits[0]["page"])
 """
 
@@ -36,13 +36,13 @@ class AmtAssistantAdapter:
 
     # ── retrieval ────────────────────────────────────────────────────────────
     def search(self, query: str, k: int = 10, history: list[dict[str, str]] | None = None) -> dict[str, Any]:
-        """Полный ответ /api/search: query_de, refused, results[…]."""
+        """Full /api/search response: query_de, refused, results[…]."""
         payload = {"query": query, "k": k, "translate": self.translate, "history": history or []}
         headers = {"x-api-key": self.api_key} if self.api_key else {}
         return self._post_json("/api/search", payload, headers)
 
     def retrieve(self, query: str, k: int = 10) -> list[dict[str, Any]]:
-        """Список фрагментов в порядке RRF. Пустой список, если система отказалась."""
+        """Excerpts in RRF order. An empty list if the system refused."""
         body = self.search(query, k)
         if body.get("refused"):
             return []
@@ -70,7 +70,7 @@ class AmtAssistantAdapter:
 
     # ── generation ───────────────────────────────────────────────────────────
     def answer(self, question: str) -> dict[str, Any]:
-        """Ответ чата: answer, citations[…], refused, refusal_reason, footer."""
+        """Chat answer: answer, citations[…], refused, refusal_reason, footer."""
         if self._token is None:
             self._token = self._post_json("/api/auth/guest", {}, {})["token"]
         req = urllib.request.Request(
@@ -79,7 +79,7 @@ class AmtAssistantAdapter:
             headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._token}"},
             method="POST",
         )
-        with urllib.request.urlopen(req, timeout=self.timeout) as res:  # noqa: S310 — URL задаёт оператор стенда
+        with urllib.request.urlopen(req, timeout=self.timeout) as res:  # noqa: S310 — the URL is set by the bench operator
             raw = res.read().decode("utf-8")
         done: dict[str, Any] | None = None
         for block in raw.split("\n\n"):
