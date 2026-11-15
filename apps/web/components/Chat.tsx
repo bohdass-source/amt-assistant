@@ -11,7 +11,7 @@ interface UiMessage {
   id?: string;
   role: 'user' | 'assistant';
   content: string;
-  /** Все фрагменты, переданные модели (пока идёт стрим), затем — только процитированные. */
+  /** All excerpts given to the model while streaming, then only the cited ones. */
   citations: Citation[];
   footer: string | null;
   refused: boolean;
@@ -113,7 +113,7 @@ export function Chat() {
             patch((m) => ({
               ...m,
               id: e.data.messageId,
-              // Сервер заменяет стрим проверенным текстом: невалидные сноски уже удалены.
+              // The server replaces the stream with the checked text: invalid footnotes are already removed.
               content: e.data.answer,
               citations: e.data.citations,
               footer: e.data.footer,

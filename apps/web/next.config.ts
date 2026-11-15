@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { NextConfig } from 'next';
 
-// В dev /api проксируется на NestJS. В Docker /api до Next не доходит — его забирает Caddy.
+// In dev, /api is proxied to NestJS. In Docker, Caddy routes /api before it reaches Next.
 const apiUrl = process.env.API_INTERNAL_URL ?? 'http://localhost:3001';
 
 const config: NextConfig = {

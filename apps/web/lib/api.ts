@@ -97,7 +97,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   return (res.status === 204 ? undefined : await res.json()) as T;
 }
 
-/** Гость получает анонимную учётку при первом визите — так работают история и оценки. */
+/** A visitor gets an anonymous guest account on the first visit so that history and ratings work. */
 export async function ensureSession(): Promise<SessionUser> {
   if (getToken()) {
     try {
@@ -121,7 +121,7 @@ export async function login(email: string, password: string): Promise<SessionUse
   return s.user;
 }
 
-/** POST + Server-Sent Events: EventSource умеет только GET, поэтому читаем поток вручную. */
+/** POST + Server-Sent Events: EventSource supports GET only, so the stream is read manually. */
 export async function streamChat(
   body: { conversationId?: string; message: string },
   onEvent: (e: ChatEvent) => void,

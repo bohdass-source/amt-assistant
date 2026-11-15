@@ -38,7 +38,7 @@ const STATUS_LABEL: Record<AdminDocument['status'], string> = {
   failed: 'ошибка',
 };
 
-/** Админ-страница на русском: ей пользуется команда проекта, а не посетители. */
+/** The admin page is in Russian only: it is used by the project team, not by visitors. */
 export function Admin() {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [data, setData] = useState<AdminData | null>(null);
