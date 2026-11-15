@@ -1,0 +1,39 @@
+# Только хранилища для локальной разработки; api, worker и web запускаются через npm.
+# Порты открыты лишь на 127.0.0.1 и сдвинуты (55432/56379/58000), чтобы не конфликтовать
+# с другими проектами; переопределяются DEV_PG_PORT / DEV_REDIS_PORT / DEV_CHROMA_PORT.
+name: amt-assistant-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: amt
+      POSTGRES_PASSWORD: amt
+      POSTGRES_DB: amt
+    ports:
+      - "127.0.0.1:${DEV_PG_PORT:-55432}:5432"
+    volumes:
+      - pg_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U amt -d amt"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "127.0.0.1:${DEV_REDIS_PORT:-56379}:6379"
+
+  chroma:
+    image: chromadb/chroma:1.5.8
+    environment:
+      ANONYMIZED_TELEMETRY: "False"
+    ports:
+      - "127.0.0.1:${DEV_CHROMA_PORT:-58000}:8000"
+    volumes:
+      - chroma_dev:/data
+
+volumes:
+  pg_dev:
+  chroma_dev:

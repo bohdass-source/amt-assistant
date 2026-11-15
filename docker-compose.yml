@@ -1,0 +1,139 @@
+# Полный стек: Caddy (HTTPS) → web (Next.js) + api (NestJS) + worker (BullMQ),
+# PostgreSQL, Redis, Chroma. Ollama — на хосте (демо на Mac) или сервисом
+# с профилем `ollama` (сервер без GPU-хоста):  docker compose --profile ollama up -d
+name: amt-assistant
+
+x-api-env: &api-env
+  NODE_ENV: production
+  DATABASE_URL: postgres://amt:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/amt
+  REDIS_URL: redis://redis:6379
+  CHROMA_URL: http://chroma:8000
+  OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+  EMBEDDING_MODEL: ${EMBEDDING_MODEL:-bge-m3}
+  LLM_BASE_URL: ${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
+  LLM_API_KEY: ${LLM_API_KEY:-ollama}
+  LLM_MODEL: ${LLM_MODEL:-qwen3.5:9b}
+  LLM_REWRITE_MODEL: ${LLM_REWRITE_MODEL:-}
+  LLM_REASONING_EFFORT: ${LLM_REASONING_EFFORT:-}
+  JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+  ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@amt.local}
+  ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+  SEARCH_API_KEY: ${SEARCH_API_KEY:-}
+  MIN_VECTOR_SIMILARITY: ${MIN_VECTOR_SIMILARITY:-0.45}
+  CORS_ORIGIN: https://${DOMAIN:-localhost}
+
+services:
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    volumes:
+      - ./infra/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment: *api-env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      chroma:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3001/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: ["node", "dist/worker.js"]
+    restart: unless-stopped
+    environment: *api-env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      chroma:
+        condition: service_started
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: amt
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: amt
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U amt -d amt"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  chroma:
+    image: chromadb/chroma:1.5.8
+    restart: unless-stopped
+    environment:
+      ANONYMIZED_TELEMETRY: "False"
+    volumes:
+      - chroma_data:/data
+
+  ollama:
+    image: ollama/ollama:0.40.12
+    profiles: ["ollama"]
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  caddy_data:
+  caddy_config:
+  pg_data:
+  redis_data:
+  chroma_data:
+  ollama_data:
