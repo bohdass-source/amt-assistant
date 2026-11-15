@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { chunkPages, detectBoilerplate, isHeading, normalizeText } from './chunker';
+import { chunkPages, detectBoilerplate, isHeading, normalizeText } from '../../src/ingest/chunker';
 
 describe('normalizeText', () => {
   it('joins hyphenated words and removes soft hyphens', () => {

@@ -9,8 +9,8 @@
     "start:dev": "nest start --watch",
     "worker": "node dist/worker.js",
     "worker:dev": "nest start --watch --entryFile worker",
-    "test": "vitest run",
-    "eval": "tsc -p tsconfig.build.json && node dist/scripts/eval.js"
+    "eval": "tsc -p tsconfig.build.json && node dist/scripts/eval.js",
+    "test:offline": "vitest run"
   },
   "dependencies": {
     "@langchain/core": "^1.4.1",

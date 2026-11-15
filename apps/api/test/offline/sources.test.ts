@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse } from 'yaml';
 import { describe, expect, it } from 'vitest';
-import { parseSources } from './sources';
+import { parseSources } from '../../src/sources/sources';
 
 const root = resolve(__dirname, '../../../..');
 

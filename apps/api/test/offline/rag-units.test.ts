@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { checkCitations, ThinkStreamFilter } from './citations';
-import { reciprocalRankFusion } from './fusion';
-import { buildFooter, detectLang } from './i18n';
-import { toOrQuery } from './keyword-search.service';
-import { parseRewrite } from './query-rewriter.service';
+import { checkCitations, ThinkStreamFilter } from '../../src/rag/citations';
+import { reciprocalRankFusion } from '../../src/rag/fusion';
+import { buildFooter, detectLang } from '../../src/rag/i18n';
+import { toOrQuery } from '../../src/rag/keyword-search.service';
+import { parseRewrite } from '../../src/rag/query-rewriter.service';
 
 describe('reciprocalRankFusion', () => {
   it('rewards items found by both retrievers', () => {
