@@ -1,19 +1,19 @@
-# Корпус amt-assistant: одна тема — пособие по безработице (Arbeitslosengeld, SGB III)
-# и оплата профессионального обучения (Förderung der beruflichen Weiterbildung).
+# amt-assistant corpus, one topic: unemployment benefit (Arbeitslosengeld, SGB III)
+# and funded vocational training (Förderung der beruflichen Weiterbildung).
 #
-# date      — редакция документа (Stand / Gültig ab), как она указана в самом PDF.
-#             Показывается пользователю рядом с каждой ссылкой.
-# date_note — дословная формулировка даты из документа.
-# retrieved — когда адрес проверен и документ скачан.
+# date      — document edition (Stand / Gültig ab) as stated in the PDF itself.
+#             Shown to the user next to every reference.
+# date_note — the date exactly as worded in the document.
+# retrieved — when the URL was checked and the document downloaded.
 #
-# Адреса проверены 2026-11-15. Ведомство меняет имена файлов (суффикс _baNNNNNN)
-# при каждой новой редакции — если ingest падает с 404, найдите новую ссылку на
-# странице-источнике (page) и обновите url и date.
+# URLs checked on 2026-11-15. The agency renames files (suffix _baNNNNNN) with
+# every new edition. If ingest fails with 404, find the new link on the source
+# page (`page`) and update `url` and `date`.
 
 topic: "Arbeitslosengeld und Förderung der beruflichen Weiterbildung (SGB III)"
 
 documents:
-  # ── Merkblätter: объяснения для граждан ──────────────────────────────────────
+  # ── Merkblätter: explanations for the public ─────────────────────────────────
   - id: ba-merkblatt-1-arbeitslose
     title: "Merkblatt 1 für Arbeitslose – Ihre Rechte, Ihre Pflichten"
     publisher: Bundesagentur für Arbeit
@@ -54,7 +54,7 @@ documents:
     date_note: "01.2026"
     retrieved: 2026-11-15
 
-  # ── Fachliche Weisungen: внутренние инструкции ведомства (Weiterbildung) ──────
+  # ── Fachliche Weisungen: the agency's internal instructions (Weiterbildung) ───
   - id: ba-fw-fbw
     title: "Fachliche Weisungen Förderung der beruflichen Weiterbildung (§§ 81–87a, 111a, 131a, 177, 180, 183 SGB III)"
     publisher: Bundesagentur für Arbeit
@@ -206,7 +206,7 @@ documents:
     date_note: "Gültig ab: 01.07.2026"
     retrieved: 2026-11-15
 
-  # ── Verordnung: допуск курсов и учебных заведений ────────────────────────────
+  # ── Verordnung: approval of training providers and courses ───────────────────
   - id: azav
     title: "Akkreditierungs- und Zulassungsverordnung Arbeitsförderung (AZAV)"
     publisher: Bundesministerium der Justiz / gesetze-im-internet.de

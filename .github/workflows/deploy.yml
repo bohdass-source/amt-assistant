@@ -1,7 +1,7 @@
 name: Deploy
 
-# Ручной запуск после зелёного CI. Сервер: Docker + compose, репозиторий
-# склонирован в DEPLOY_PATH, рядом лежит заполненный .env.
+# Run manually after CI is green. Server: Docker with compose, the repository
+# cloned into DEPLOY_PATH with a filled-in .env next to it.
 on:
   workflow_dispatch:
 

@@ -1,4 +1,4 @@
-# Сборка из корня репозитория: docker build -f apps/api/Dockerfile .
+# Build from the repository root: docker build -f apps/api/Dockerfile .
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./

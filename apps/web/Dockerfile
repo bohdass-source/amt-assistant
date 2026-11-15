@@ -1,4 +1,4 @@
-# Сборка из корня репозитория: docker build -f apps/web/Dockerfile .
+# Build from the repository root: docker build -f apps/web/Dockerfile .
 FROM node:22-bookworm-slim AS build
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1

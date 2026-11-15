@@ -2,7 +2,7 @@
   "name": "amt-assistant",
   "version": "0.1.0",
   "private": true,
-  "description": "RAG-ассистент на русском и украинском по официальным немецким документам о пособии по безработице и оплате обучения.",
+  "description": "RAG assistant that answers in Russian and Ukrainian from official German documents on unemployment benefit and funded vocational training.",
   "license": "MIT",
   "workspaces": [
     "apps/api",

@@ -1,6 +1,6 @@
-# Полный стек: Caddy (HTTPS) → web (Next.js) + api (NestJS) + worker (BullMQ),
-# PostgreSQL, Redis, Chroma. Ollama — на хосте (демо на Mac) или сервисом
-# с профилем `ollama` (сервер без GPU-хоста):  docker compose --profile ollama up -d
+# Full stack: Caddy (HTTPS) → web (Next.js) + api (NestJS) + worker (BullMQ),
+# PostgreSQL, Redis, Chroma. Ollama runs on the host (Mac demo) or as a service
+# under the `ollama` profile (server without a GPU host):  docker compose --profile ollama up -d
 name: amt-assistant
 
 x-api-env: &api-env

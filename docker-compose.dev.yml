@@ -1,6 +1,6 @@
-# Только хранилища для локальной разработки; api, worker и web запускаются через npm.
-# Порты открыты лишь на 127.0.0.1 и сдвинуты (55432/56379/58000), чтобы не конфликтовать
-# с другими проектами; переопределяются DEV_PG_PORT / DEV_REDIS_PORT / DEV_CHROMA_PORT.
+# Data stores only, for local development; api, worker and web run via npm.
+# Ports bind to 127.0.0.1 only and are shifted (55432/56379/58000) to avoid clashing
+# with other projects; override with DEV_PG_PORT / DEV_REDIS_PORT / DEV_CHROMA_PORT.
 name: amt-assistant-dev
 
 services:

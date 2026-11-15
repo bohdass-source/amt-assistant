@@ -1,5 +1,5 @@
-# DOMAIN=localhost → Caddy выпускает локальный сертификат (демо).
-# DOMAIN=amt.example.org → автоматический Let's Encrypt (A-запись должна указывать на сервер).
+# DOMAIN=localhost → Caddy issues a local certificate (demo).
+# DOMAIN=amt.example.org → automatic Let's Encrypt (the A record must point at the server).
 {
 	email {$ACME_EMAIL:admin@localhost}
 }
@@ -14,7 +14,7 @@
 		-Server
 	}
 
-	# API: без сжатия и с немедленным flush, иначе SSE-стрим чата приходит одним куском.
+	# API: no compression and immediate flush, otherwise the chat SSE stream arrives in one piece.
 	handle /api/* {
 		reverse_proxy api:3001 {
 			flush_interval -1
