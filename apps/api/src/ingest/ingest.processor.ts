@@ -35,8 +35,10 @@ export class IngestProcessor extends WorkerHost {
     const pdf = await downloadPdf(source.url);
     const sha256 = createHash('sha256').update(pdf).digest('hex');
 
-    // Re-ingest guard: the same file is already indexed, nothing to do.
-    if (!force && previous?.status === 'ready' && previous.sha256 === sha256) {
+    // Re-ingest guard: the same file is already indexed, nothing to do. sha256 is written
+    // only by a successful run, so it is checked instead of the status, which the API
+    // has already set to `queued` by the time the job runs.
+    if (!force && previous?.sha256 === sha256 && (previous.chunks ?? 0) > 0) {
       await this.documents.setStatus(documentId, 'ready');
       this.log.log(`${documentId}: unchanged (${sha256.slice(0, 12)}), skipped`);
       return { documentId, skipped: true, reason: 'unchanged', sha256 };

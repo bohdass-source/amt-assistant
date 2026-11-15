@@ -23,6 +23,8 @@ export class IngestService {
     }
     if (existing) await existing.remove();
 
+    // Set before adding: a fast job could otherwise finish first and `queued` would overwrite `ready`.
+    await this.documents.setStatus(documentId, 'queued');
     await this.queue.add(
       'ingest',
       { documentId, force },
@@ -34,7 +36,6 @@ export class IngestService {
         removeOnFail: { age: 7 * 24 * 3600 },
       },
     );
-    await this.documents.setStatus(documentId, 'queued');
     return { documentId, queued: true };
   }
 
