@@ -23,6 +23,7 @@ const CONTENT_FILES = [
   /^apps\/web\/components\/Shell\.tsx$/, // bilingual label of the language switch
   /^apps\/web\/app\/(layout|admin\/page|sources\/page)\.tsx$/, // page titles and meta description
   /^data\/eval\/questions\.yaml$/, // control questions as users would type them
+  /^reports\/live\/[^/]+\.json$/, // live check reports quote those questions
   /\.test\.ts$/, // test fixtures
   /^apps\/api\/test\/offline\/fakes\.ts$/, // fixtures shared by the offline tests
 ];

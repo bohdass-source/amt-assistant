@@ -1,0 +1,474 @@
+{
+  "check": "live",
+  "mode": "search",
+  "startedAt": "2026-11-15T17:51:24.814Z",
+  "finishedAt": "2026-11-15T17:53:34.467Z",
+  "gitCommit": "b588731",
+  "api": "http://localhost:3001",
+  "models": {
+    "embedding": "bge-m3",
+    "answer": "qwen3.5:9b",
+    "rewrite": "qwen3.5:9b"
+  },
+  "index": {
+    "documents": 20,
+    "chunks": 1019
+  },
+  "settings": {
+    "k": 3,
+    "min": 16,
+    "minVectorSimilarity": 0.45
+  },
+  "summary": {
+    "expectedSource": "19/20",
+    "outOfCorpusRefused": "6/6",
+    "pass": true,
+    "medianMs": 4604
+  },
+  "outcomes": [
+    {
+      "id": "q01-hoehe",
+      "kind": "answerable",
+      "question": "Сколько процентов от зарплаты составляет пособие по безработице?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "expected": [
+        "ba-fw-149",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Wie hoch ist der Prozentsatz des Arbeitsentgelts bei der Bemessung des Arbeitslosengeldes?",
+      "ms": 14482
+    },
+    {
+      "id": "q02-dauer-58",
+      "kind": "answerable",
+      "question": "Сколько месяцев платят Arbeitslosengeld, если мне 58 лет?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "expected": [
+        "ba-fw-147",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Wie lange dauert der Anspruch auf Arbeitslosengeld bei einem Alter von 58 Jahren?",
+      "ms": 4522
+    },
+    {
+      "id": "q03-sperrzeit-kuendigung",
+      "kind": "answerable",
+      "question": "Получу ли я пособие, если сам уволился с работы?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "expected": [
+        "ba-fw-159",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Arbeitslosengeld Anspruch bei eigenständiger Kündigung",
+      "ms": 4108
+    },
+    {
+      "id": "q04-meldeversaeumnis",
+      "kind": "answerable",
+      "question": "Що буде, якщо я не прийду на призначену зустріч в агентство з праці?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose",
+        "ba-fw-159"
+      ],
+      "expected": [
+        "ba-fw-159",
+        "ba-merkblatt-1-arbeitslose",
+        "ba-merkblatt-arbeitsuche"
+      ],
+      "queryDe": "Folgen bei Nichterscheinen zur Terminvereinbarung Agentur für Arbeit Meldeversäumnis",
+      "ms": 4597
+    },
+    {
+      "id": "q05-anwartschaft",
+      "kind": "answerable",
+      "question": "Сколько нужно проработать, чтобы получить право на пособие по безработице?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "expected": [
+        "ba-fw-142",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Wie lange muss man arbeiten, um Anspruch auf Arbeitslosengeld zu haben?",
+      "ms": 4887
+    },
+    {
+      "id": "q06-meldung-frist",
+      "kind": "answerable",
+      "question": "Коли потрібно зареєструватися як шукач роботи, якщо мене звільняють?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "expected": [
+        "ba-merkblatt-1-arbeitslose",
+        "ba-merkblatt-arbeitsuche"
+      ],
+      "queryDe": "Wann muss ich sich als Arbeitsuchender bei der Agentur für Arbeit anmelden?",
+      "ms": 4451
+    },
+    {
+      "id": "q07-nebeneinkommen",
+      "kind": "answerable",
+      "question": "Сколько можно зарабатывать подработкой, пока получаю пособие, чтобы его не урезали?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-6-weiterbildung",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "expected": [
+        "ba-fw-155",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Wie viel Nebeneinkommen ist bei Arbeitslosengeld zulässig ohne Kürzung?",
+      "ms": 4971
+    },
+    {
+      "id": "q08-15-stunden",
+      "kind": "answerable",
+      "question": "Скільки годин на тиждень можна працювати, щоб все ще вважатися безробітним?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-fw-138",
+        "ba-merkblatt-arbeitsuche"
+      ],
+      "expected": [
+        "ba-fw-138",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Wie viele Stunden pro Woche kann man arbeiten und bleibt man arbeitslos?",
+      "ms": 4604
+    },
+    {
+      "id": "q09-bemessung",
+      "kind": "answerable",
+      "question": "За какой период берут зарплату для расчёта суммы пособия?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose",
+        "ba-hinweise-versicherungspflicht-antrag",
+        "ba-fw-151"
+      ],
+      "expected": [
+        "ba-fw-150",
+        "ba-fw-151",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Für welchen Zeitraum wird das Arbeitsentgelt zur Bemessung des Arbeitslosengeldes herangezogen?",
+      "ms": 5183
+    },
+    {
+      "id": "q10-urlaubsabgeltung",
+      "kind": "answerable",
+      "question": "Что будет с пособием, если работодатель выплатил мне компенсацию за неиспользованный отпуск?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-fw-157",
+        "ba-fw-147"
+      ],
+      "expected": [
+        "ba-fw-157",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Auswirkung Urlaubsabgeltung auf Anspruch Arbeitslosengeld",
+      "ms": 4795
+    },
+    {
+      "id": "q11-krankengeld",
+      "kind": "answerable",
+      "question": "Чи виплачують допомогу з безробіття, якщо я отримую лікарняні (Krankengeld)?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose",
+        "ba-fw-156"
+      ],
+      "expected": [
+        "ba-fw-156",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Arbeitslosengeld bei Bezug von Krankengeld",
+      "ms": 4306
+    },
+    {
+      "id": "q12-arbeitslosmeldung-online",
+      "kind": "answerable",
+      "question": "Можно ли встать на учёт как безработный онлайн или нужно прийти лично?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose",
+        "ba-fw-141"
+      ],
+      "expected": [
+        "ba-fw-141",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Arbeitslosmeldung online oder persönlich bei der Agentur für Arbeit",
+      "ms": 4769
+    },
+    {
+      "id": "q13-bildungsgutschein",
+      "kind": "answerable",
+      "question": "Что такое Bildungsgutschein и как его получить?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-6-weiterbildung",
+        "ba-fw-fbw"
+      ],
+      "expected": [
+        "ba-merkblatt-6-weiterbildung",
+        "ba-fw-fbw"
+      ],
+      "queryDe": "Was ist ein Bildungsgutschein und wie bekomme ich einen?",
+      "ms": 4543
+    },
+    {
+      "id": "q14-fahrkosten-kinder",
+      "kind": "answerable",
+      "question": "Чи оплачує агентство проїзд і догляд за дитиною під час навчання?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose",
+        "ba-merkblatt-6-weiterbildung",
+        "ba-fw-fbw"
+      ],
+      "expected": [
+        "ba-merkblatt-6-weiterbildung",
+        "ba-fw-fbw"
+      ],
+      "queryDe": "Werden Fahrtkosten und Kinderbetreuung während der Weiterbildung vom Arbeitsamt übernommen?",
+      "ms": 5541
+    },
+    {
+      "id": "q15-praemie",
+      "kind": "answerable",
+      "question": "Есть ли денежная премия за успешно сданный экзамен во время переобучения?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-6-weiterbildung",
+        "ba-fw-fbw"
+      ],
+      "expected": [
+        "ba-merkblatt-6-weiterbildung",
+        "ba-fw-fbw"
+      ],
+      "queryDe": "Weiterbildungsprämie bei erfolgreichem Abschluss der Umschulung",
+      "ms": 5314
+    },
+    {
+      "id": "q16-alg-bei-weiterbildung",
+      "kind": "answerable",
+      "question": "Чи отримую я допомогу з безробіття, поки навчаюся на курсах за Bildungsgutschein?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose",
+        "ba-merkblatt-6-weiterbildung"
+      ],
+      "expected": [
+        "ba-merkblatt-6-weiterbildung",
+        "ba-fw-136",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Arbeitslosengeld während der Weiterbildung mit Bildungsgutschein erhalten",
+      "ms": 5016
+    },
+    {
+      "id": "q17-azav",
+      "kind": "answerable",
+      "question": "Какие требования к курсу и учебному заведению, чтобы агентство оплатило обучение?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-fw-fbw",
+        "azav"
+      ],
+      "expected": [
+        "azav",
+        "ba-merkblatt-6-weiterbildung",
+        "ba-fw-fbw"
+      ],
+      "queryDe": "Welche Anforderungen an den Kurs und die Bildungseinrichtung für eine Förderung nach AZAV?",
+      "ms": 6394
+    },
+    {
+      "id": "q18-freiwillige-versicherung",
+      "kind": "answerable",
+      "question": "Может ли самозанятый добровольно застраховаться на случай безработицы?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-hinweise-versicherungspflicht-antrag",
+        "ba-fw-150"
+      ],
+      "expected": [
+        "ba-hinweise-versicherungspflicht-antrag",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Kann ein Selbstständiger sich freiwillig zur Arbeitslosenversicherung versichern",
+      "ms": 5124
+    },
+    {
+      "id": "q19-ortsabwesenheit",
+      "kind": "answerable",
+      "question": "Чи потрібно повідомляти агентство, якщо я їду у відпустку, поки отримую допомогу?",
+      "pass": true,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose",
+        "ba-fw-141"
+      ],
+      "expected": [
+        "ba-merkblatt-1-arbeitslose",
+        "ba-fw-138"
+      ],
+      "queryDe": "Pflichten Arbeitsloser Urlaub Abgeltung Meldung Bundesagentur für Arbeit",
+      "ms": 4717
+    },
+    {
+      "id": "q20-ohne-alg-pflichten",
+      "kind": "answerable",
+      "question": "Я ищу работу, но пособие не получаю. Какие у меня обязанности перед агентством?",
+      "pass": false,
+      "refused": false,
+      "refusalReason": null,
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "expected": [
+        "ba-merkblatt-arbeitsuche"
+      ],
+      "queryDe": "Pflichten von Arbeitslosen und Arbeitsuchenden gegenüber der Agentur für Arbeit",
+      "ms": 4534
+    },
+    {
+      "id": "o01-kindergeld",
+      "kind": "out_of_corpus",
+      "question": "Как оформить Kindergeld на ребёнка?",
+      "pass": true,
+      "refused": true,
+      "refusalReason": "out_of_scope",
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose",
+        "ba-fw-149"
+      ],
+      "queryDe": "Как оформить Kindergeld на ребёнка?",
+      "ms": 3796
+    },
+    {
+      "id": "o02-aufenthalt",
+      "kind": "out_of_corpus",
+      "question": "Як продовжити посвідку на проживання в Німеччині?",
+      "pass": true,
+      "refused": true,
+      "refusalReason": "out_of_scope",
+      "foundDocuments": [
+        "ba-fw-138"
+      ],
+      "queryDe": "Як продовжити посвідку на проживання в Німеччині?",
+      "ms": 3754
+    },
+    {
+      "id": "o03-wetter",
+      "kind": "out_of_corpus",
+      "question": "Какая завтра погода в Берлине?",
+      "pass": true,
+      "refused": true,
+      "refusalReason": "out_of_scope",
+      "foundDocuments": [
+        "ba-merkblatt-1-arbeitslose",
+        "ba-merkblatt-6-weiterbildung",
+        "ba-fw-141"
+      ],
+      "queryDe": "Какая завтра погода в Берлине?",
+      "ms": 3932
+    },
+    {
+      "id": "o04-elterngeld",
+      "kind": "out_of_corpus",
+      "question": "Сколько составляет Elterngeld и где подать заявление?",
+      "pass": true,
+      "refused": true,
+      "refusalReason": "out_of_scope",
+      "foundDocuments": [
+        "ba-hinweise-versicherungspflicht-antrag",
+        "ba-merkblatt-1-arbeitslose",
+        "ba-fw-150"
+      ],
+      "queryDe": "Сколько составляет Elterngeld и где подать заявление?",
+      "ms": 4215
+    },
+    {
+      "id": "o05-steuer",
+      "kind": "out_of_corpus",
+      "question": "Як подати податкову декларацію за минулий рік?",
+      "pass": true,
+      "refused": true,
+      "refusalReason": "out_of_scope",
+      "foundDocuments": [
+        "ba-merkblatt-6-weiterbildung",
+        "ba-merkblatt-1-arbeitslose"
+      ],
+      "queryDe": "Як подати податкову декларацію за минулий рік?",
+      "ms": 3655
+    },
+    {
+      "id": "o06-deutschlandticket",
+      "kind": "out_of_corpus",
+      "question": "Сколько стоит Deutschlandticket?",
+      "pass": true,
+      "refused": true,
+      "refusalReason": "out_of_scope",
+      "foundDocuments": [
+        "ba-fw-fbw",
+        "ba-merkblatt-6-weiterbildung"
+      ],
+      "queryDe": "Сколько стоит Deutschlandticket?",
+      "ms": 3431
+    }
+  ]
+}
