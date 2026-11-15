@@ -1,14 +1,15 @@
-# Контрольные вопросы amt-assistant.
+# amt-assistant control questions. Questions are in Russian and Ukrainian on purpose:
+# that is what users type.
 #
-# answerable:    вопрос «засчитан», если среди источников ответа (или top-k поиска)
-#                есть хотя бы один документ из expected_documents.
-#                Критерий готовности: ≥ 16 из 20.
-# out_of_corpus: вопрос засчитан, если система отказалась отвечать. Должны пройти все.
+# answerable:    a question passes if at least one document from expected_documents
+#                is among the answer's sources (or the search top-k).
+#                Target: at least 16 of 20.
+# out_of_corpus: a question passes if the system refuses to answer. All must pass.
 #
-# expected_documents — несколько допустимых документов: одни и те же правила
-# объясняются и в Merkblatt, и в Fachliche Weisungen.
-# Ожидания составлены по содержанию документов и проверяются прогоном
-# `npm run eval`; после первого прогона их стоит сверить вручную.
+# expected_documents lists several acceptable documents, because the same rule is
+# explained both in a Merkblatt and in the Fachliche Weisungen.
+# The expectations were written from the documents' content, not by a lawyer, and
+# are checked by `npm run eval`. They should be reviewed by hand.
 
 answerable:
   - id: q01-hoehe

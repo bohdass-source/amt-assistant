@@ -22,6 +22,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - name: English-only code and docs
+        run: npm run check:english
       - name: Typecheck
         run: npm run typecheck
       - name: Unit tests (chunker, fusion, citations, sources.yaml, eval set)
