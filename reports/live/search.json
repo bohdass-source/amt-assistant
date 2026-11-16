@@ -3,7 +3,7 @@
   "mode": "search",
   "startedAt": "2026-11-15T17:51:24.814Z",
   "finishedAt": "2026-11-15T17:53:34.467Z",
-  "gitCommit": "b588731",
+  "gitCommit": "c4e6bb1",
   "api": "http://localhost:3001",
   "models": {
     "embedding": "bge-m3",
