@@ -1,58 +1,105 @@
 # amt-assistant
 
-Публичный RAG-ассистент: отвечает **на русском и украинском** по официальным
-немецким документам о **пособии по безработице (Arbeitslosengeld)** и **оплате
-профессионального обучения (Bildungsgutschein, Förderung der beruflichen
-Weiterbildung)**. В каждом ответе есть ссылка на документ, страницу и дату редакции.
+Answers questions in **Russian and Ukrainian** about German **unemployment benefit
+(Arbeitslosengeld)** and **funded vocational training (Bildungsgutschein)**, using only
+official documents of the Bundesagentur für Arbeit. Every answer cites the document,
+the PDF page and the edition date; questions the documents do not cover are refused.
 
-> Это справка по документам, а не юридическая консультация. Пометка стоит на
-> сайте и добавляется кодом к каждому ответу.
+> This is reference information from official documents, not legal advice. The site
+> says so on every page, and the code adds the same note to every answer.
 
-**Проблема.** Merkblätter и Fachliche Weisungen Bundesagentur für Arbeit написаны
-сложным канцелярским немецким. Приезжим трудно найти в них ответ на простой
-вопрос «получу ли я пособие, если уволюсь сам?».
+## The problem
 
-## Как это работает
+The rules for unemployment benefit are published by the Bundesagentur für Arbeit in
+German: leaflets (Merkblätter) of up to 100 pages and internal instructions (Fachliche
+Weisungen) written in legal language. People who moved to Germany recently, many of
+them from Ukraine, often cannot find in these documents the answer to a simple question
+such as "Will I get benefit if I quit my job myself?" or "Who pays for a retraining
+course?". Machine translation of the whole PDF does not tell them which page applies.
+
+## Who it is for
+
+- Russian- and Ukrainian-speaking people in Germany who are unemployed, about to be,
+  or looking for a funded course.
+- Volunteers and counsellors who help them and need to find the right page in the
+  official documents quickly.
+
+It does not decide individual cases. It points to the passages of the official
+documents that deal with the question, so the reader can check them or take them to the
+Agentur für Arbeit.
+
+![Answer in Russian with footnotes; the sources panel shows the cited pages](docs/screenshots/chat-answer-ru.png)
+
+*An answer from the local `qwen3.5:9b` model. The footnotes point at the right pages
+of Merkblatt 6; the Russian wording has errors (for example the invented word
+`образованиевый`). See [Known limitations](#known-limitations).*
+
+| Out-of-scope question in Ukrainian, phone width | Corpus page and admin page |
+|---|---|
+| <img src="docs/screenshots/chat-refusal-uk-mobile.png" alt="Refusal of a question about Kindergeld" width="300"> | <img src="docs/screenshots/sources.png" alt="List of the 20 source documents with edition dates" width="420"><br><img src="docs/screenshots/admin.png" alt="Admin page with ingest status of all documents" width="420"> |
+
+## What was checked, and how
+
+| What | How | Result |
+|---|---|---|
+| Pipeline logic | 64 offline tests in [`apps/api/test/offline`](apps/api/test/offline): fakes for the model, Chroma, Postgres and storage; network access throws | All pass. To see that the tests can fail, the code was broken on purpose seven ways (ignore a retrieval refusal, accept an uncited answer, stream `NO_ANSWER`, drop the similarity threshold, keep vanished rows, read empty env values as set, skip unchanged files only when the status is `ready`); each break failed a test |
+| Retrieval with a real model | Live check `npm run live:search`, 20 control questions + 6 out-of-corpus questions | 19/20 expected document in the top 3, 6/6 refused ([report](reports/live/search.md)) |
+| Answers with a real model | Live check `npm run live:answer`: expected document among the footnotes of the generated answer | 19/20, 6/6 refused, median 25 s per answer ([report](reports/live/answer.md)) |
+| Full Docker stack | `docker compose up` on macOS (Docker Desktop), Ollama on the host; live search through Caddy over HTTPS | 20 documents indexed in about 70 s; 19/20, 6/6 ([report](reports/live/docker/search.md)); the answer stream arrives in pieces through Caddy; re-ingesting an unchanged file is skipped |
+| Web UI | Headless Chrome and a browser, desktop and 390 px width, production build | Chat, footnotes, sources panel, history, ratings, refusals, admin login and ingest status work |
+| rag-probe adapter | Smoke test of [`amt_assistant_adapter.py`](integrations/rag-probe/amt_assistant_adapter.py) against the local API | Returns ranked excerpts; not yet run inside rag-probe itself |
+
+All live checks used `bge-m3` embeddings and `qwen3.5:9b` for the query rewrite and the
+answers, through a local Ollama on a Mac. The control questions and the expected
+documents are in [`data/eval/questions.yaml`](data/eval/questions.yaml).
+
+Not checked yet: deployment to a server with a real domain and Let's Encrypt, the
+`ollama` Compose profile, the real llm-gateway, and the CI workflow on GitHub.
+
+## How it works
 
 ```mermaid
 flowchart LR
-  U[Вопрос ru/uk] --> RW[LLM: перевод на немецкий<br/>с учётом истории + проверка темы]
-  RW --> V[Chroma<br/>bge-m3 через Ollama]
-  RW --> K[PostgreSQL FTS<br/>german, OR-запрос]
-  V --> F[RRF-слияние]
+  U[Question in ru/uk] --> RW[LLM: rewrite into German<br/>with chat history, topic check]
+  RW --> V[Chroma<br/>bge-m3 via Ollama]
+  RW --> K[PostgreSQL full-text<br/>german, OR query]
+  V --> F[Reciprocal rank fusion]
   K --> F
-  F --> T{Порог отказа<br/>сходство, тема}
-  T -- нет --> R[Отказ + пометка]
-  T -- да --> G[llm-gateway: ответ<br/>только из фрагментов, сноски n]
-  G --> C[Код проверяет сноски:<br/>каждая n → переданный фрагмент]
-  C --> A[Ответ + источники,<br/>страницы, даты, пометка]
+  F --> T{Refusal checks<br/>topic, similarity}
+  T -- refuse --> R[Refusal + note]
+  T -- answer --> G[llm-gateway: answer only<br/>from excerpts, footnotes n]
+  G --> C[Code checks footnotes:<br/>every n → an excerpt sent]
+  C --> A[Answer + sources,<br/>pages, edition dates, note]
 ```
 
-**Ingest** — фоновая задача BullMQ в отдельном процессе `worker`:
-скачать PDF → SHA-256 (если файл не изменился, задача пропускается) → текст по
-страницам (`pdf-parse`) → чанкинг по разделам (§, нумерованные заголовки,
-Anlagen; раздел переходит через страницу, фрагмент — никогда) → удаление
-колонтитулов → эмбеддинги `bge-m3` → Chroma + PostgreSQL (`tsvector german`).
-Один `jobId` на документ: повторная постановка в очередь, пока задача ждёт или
-выполняется, игнорируется.
+**Refusals happen at three points.** The rewrite model marks off-topic questions
+(Kindergeld, residence permits, taxes…); retrieval refuses when the best vector match is
+below `MIN_VECTOR_SIMILARITY` (0.45); after generation, code replaces the answer with a
+refusal if the model said `NO_ANSWER` or if no footnote points at an excerpt it was
+given. Footnotes to excerpts that were not sent are removed.
 
-**Ответ** — SSE-стрим `meta → sources → token… → done`. В `done` сервер отдаёт
-проверенный текст: сноски на несуществующие фрагменты удалены; если не осталось
-ни одной верной сноски или модель ответила `NO_ANSWER`, ответ заменяется отказом.
+**Ingest** runs as a BullMQ job in a separate `worker` process: download the PDF →
+SHA-256 (an unchanged file is skipped) → text per page (`pdf-parse`) → chunking by
+section (§, numbered headings, Anlagen; a section may span pages, a chunk never does)
+→ running headers and footers removed → `bge-m3` embeddings → Chroma and PostgreSQL
+(`tsvector german`). One job id per document, so a second request while a job is
+waiting or running is ignored.
 
-| Компонент | Что делает |
+**Answers** are streamed as Server-Sent Events: `meta → sources → token… → done`. The
+`done` event carries the checked text, which replaces the streamed one.
+
+| Part | Role |
 |---|---|
-| `apps/api` | NestJS 11: auth (admin/user, гостевые сессии), чат, `/api/search`, админка, BullMQ-producer |
-| `apps/api` → `dist/worker.js` | тот же код, процесс-потребитель очереди ingest |
-| `apps/web` | Next.js 15: чат со стримингом и панелью источников, история, оценки, «Источники», админ-страница |
-| `data/sources.yaml` | 20 официальных документов: адрес, редакция, дата проверки |
-| `data/eval/questions.yaml` | 20 контрольных вопросов + 6 вопросов вне корпуса |
-| `integrations/rag-probe` | HTTP-адаптер для стенда rag-probe |
-| `infra/Caddyfile` | HTTPS (Let's Encrypt или локальный сертификат), SSE без буферизации |
+| [`apps/api`](apps/api) | NestJS 11: auth (admin/user, guest sessions), chat, `/api/search`, admin, ingest queue producer |
+| `apps/api` → `dist/worker.js` | Same code base, ingest queue consumer |
+| [`apps/web`](apps/web) | Next.js 15: streaming chat, sources panel, history, ratings, sources page, admin page |
+| [`data/sources.yaml`](data/sources.yaml) | The 20 documents: URL, edition, date the URL was checked |
+| [`integrations/rag-probe`](integrations/rag-probe/README.md) | HTTP adapter for the rag-probe test bench |
+| [`infra/Caddyfile`](infra/Caddyfile) | HTTPS (Let's Encrypt or a local CA), SSE without buffering |
 
-## Демо локально (Mac)
+## Run it locally
 
-Нужны Docker Desktop, Node 22 и Ollama.
+You need Docker, Node 22 and [Ollama](https://ollama.com) with two models:
 
 ```bash
 ollama pull bge-m3
@@ -62,25 +109,25 @@ ollama pull bge-m3
 ollama pull qwen3.5:9b
 ```
 
-### Вариант A — всё в Docker, как на сервере
+### Option A: everything in Docker, as on a server
 
 ```bash
 cp .env.example .env
 ```
 
-Поменяйте в `.env` пароли и `JWT_SECRET`, затем:
+Set `POSTGRES_PASSWORD`, `JWT_SECRET` and `ADMIN_PASSWORD` in `.env` (for example with
+`openssl rand -hex 24`), then:
 
 ```bash
 docker compose up -d --build
 ```
 
-Откройте https://localhost (Caddy выпустит локальный сертификат — браузер
-попросит подтвердить исключение). Админка: https://localhost/admin, вход —
-`ADMIN_EMAIL` / `ADMIN_PASSWORD` из `.env`. Нажмите «Загрузить все из
-sources.yaml» — worker скачает и проиндексирует 20 документов (несколько минут,
-зависит от скорости эмбеддингов).
+Open https://localhost. Caddy issues a certificate from its own local CA, so the browser
+shows a warning. The admin page is https://localhost/admin (log in with `ADMIN_EMAIL` /
+`ADMIN_PASSWORD`); press `Загрузить все из sources.yaml` to download and index the
+20 documents.
 
-### Вариант B — хранилища в Docker, код через npm (удобно для разработки)
+### Option B: data stores in Docker, code with npm (for development)
 
 ```bash
 npm install
@@ -94,7 +141,7 @@ npm run infra:up
 cp apps/api/.env.example apps/api/.env
 ```
 
-В трёх терминалах:
+Then, in three terminals:
 
 ```bash
 npm run dev:api
@@ -108,66 +155,130 @@ npm run dev:worker
 npm run dev:web
 ```
 
-Сайт — http://localhost:3000, API — http://localhost:3001/api/health.
-Хранилища слушают сдвинутые порты 55432 / 56379 / 58000, чтобы не мешать
-другим проектам (переопределяются `DEV_PG_PORT`, `DEV_REDIS_PORT`, `DEV_CHROMA_PORT`).
+The site is at http://localhost:3000, the API at http://localhost:3001/api/health. The
+data stores listen on 127.0.0.1 with shifted ports 55432 / 56379 / 58000
+(`DEV_PG_PORT`, `DEV_REDIS_PORT`, `DEV_CHROMA_PORT`).
 
-> **«Думающие» модели.** У `qwen3.x` по умолчанию включены размышления: перевод
-> вопроса занимает ~200 с вместо 1–4 с. `LLM_REASONING_EFFORT=none` (уже в
-> `.env.example`) отключает их — значение уходит в запрос как `reasoning_effort`.
+> **Reasoning models.** `qwen3.x` reasons by default, and the query rewrite then takes
+> about 200 s instead of 1–4 s. `LLM_REASONING_EFFORT=none` (already in
+> `.env.example`) turns it off; it is sent to the model as `reasoning_effort`.
 
-## Оценка
+## Tests and live checks
 
-```bash
-npm run eval -- --mode=search --k=3
-```
+These are two different things and are named so they cannot be confused.
 
-```bash
-npm run eval -- --mode=answer --out=../../reports/eval-answer.json
-```
+| | Offline tests | Live checks |
+|---|---|---|
+| Command | `npm run test:offline` | `npm run live:search`, `npm run live:answer` |
+| Code | [`apps/api/test/offline`](apps/api/test/offline) | [`apps/api/src/live/live-check.ts`](apps/api/src/live/live-check.ts) |
+| Needs | Nothing; the network is blocked | A running API, a real model, an indexed corpus |
+| Measures | Whether the code does what it should | How well the model and the corpus answer the control questions |
+| In CI | Yes | No |
+| Output | Test results | `reports/live/<mode>.md` and `.json` with commit, models and index size |
 
-Критерий готовности: верный источник ≥ 16 из 20, все 6 вопросов вне корпуса
-получают отказ. Скрипт завершается с кодом 1, если критерий не выполнен.
-Порог отказа подбирается переменной `MIN_VECTOR_SIMILARITY` (по умолчанию 0.45).
+A live check exits with 0 if at least 16 of 20 questions get the expected document and
+every out-of-corpus question is refused, with 1 if not, and with 2 if there is no running
+system to check. Point it at another deployment with `--api=https://…`.
+
+CI also runs `npm run check:english` (code and docs stay in English; Russian and
+Ukrainian only in user-facing strings and test data) and `npm run check:links` (every
+relative link and image in Markdown points at a tracked file).
 
 ## API
 
-| Метод | Путь | Доступ |
+| Method | Path | Access |
 |---|---|---|
-| POST | `/api/auth/guest`, `/api/auth/register`, `/api/auth/login` | все |
+| POST | `/api/auth/guest`, `/api/auth/register`, `/api/auth/login` | anyone |
 | GET | `/api/auth/me` | user |
 | POST | `/api/chat` (SSE) | user |
-| GET/DELETE | `/api/conversations[/:id]` | владелец |
-| POST | `/api/messages/:id/rating` `{score: 1 \| -1}` | владелец |
-| POST | `/api/search` — поиск без генерации, [контракт](docs/search-api.md) | все или `x-api-key` |
-| GET | `/api/documents`, `/api/health` | все |
+| GET/DELETE | `/api/conversations[/:id]` | owner |
+| POST | `/api/messages/:id/rating` `{score: 1 \| -1}` | owner |
+| POST | `/api/search`: retrieval without generation, [contract](docs/search-api.md) | anyone, or `x-api-key` if `SEARCH_API_KEY` is set |
+| GET | `/api/documents`, `/api/health` | anyone |
 | GET | `/api/admin/documents`, `/api/admin/stats` | admin |
 | POST | `/api/admin/documents/sync`, `/api/admin/documents/:id/ingest` `{force}` | admin |
 
-## Развёртывание на сервере
+## Deploying to a server
 
-1. Сервер с Docker, A-запись домена указывает на него, открыты порты 80 и 443.
-2. `git clone` в `/opt/amt-assistant`, `cp .env.example .env`, задать `DOMAIN`,
-   `ACME_EMAIL`, пароли, `LLM_BASE_URL`/`LLM_API_KEY`/`LLM_MODEL` вашего llm-gateway.
-3. Ollama для эмбеддингов: либо на хосте (`OLLAMA_URL=http://host.docker.internal:11434`),
-   либо в compose — `docker compose --profile ollama up -d` и `OLLAMA_URL=http://ollama:11434`,
-   затем `docker compose exec ollama ollama pull bge-m3`.
-4. `docker compose up -d --build` — Caddy сам получит сертификат Let's Encrypt.
-5. В GitHub: секреты `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS`,
-   переменные `DEPLOY_PATH`, `DOMAIN`; деплой — ручной запуск workflow **Deploy**.
+Not done yet for this project; these are the intended steps.
 
-## Обновление корпуса
+1. A server with Docker, an A record for the domain pointing at it, ports 80 and 443 open.
+2. Clone into `/opt/amt-assistant`, `cp .env.example .env`, set `DOMAIN`, the secrets
+   and `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL` of the llm-gateway.
+3. Embeddings: Ollama on the host (`OLLAMA_URL=http://host.docker.internal:11434`) or in
+   Compose (`docker compose --profile ollama up -d`, `OLLAMA_URL=http://ollama:11434`,
+   then `docker compose exec ollama ollama pull bge-m3`).
+4. `docker compose up -d --build`. Caddy gets a Let's Encrypt certificate for `DOMAIN`.
+5. On GitHub: secrets `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS`
+   and variables `DEPLOY_PATH`, `DOMAIN`; deploy by running the **Deploy** workflow.
 
-Ведомство меняет имена файлов (`…_baNNNNNN.pdf`) с каждой редакцией. Если ingest
-падает с 404, найдите новую ссылку на странице из поля `page`, обновите `url` и
-`date` в `data/sources.yaml` и нажмите «Переиндексировать» в админке. Документы,
-которые убрали из YAML, админка показывает отдельно.
+## Updating the corpus
 
-## Ограничения первой версии
+The agency renames its files (`…_baNNNNNN.pdf`) with every edition. If ingest fails with
+404, find the new link on the page given in the document's `page` field, update `url`
+and `date` in [`data/sources.yaml`](data/sources.yaml) and press `Переиндексировать` on
+the admin page. Documents removed from the YAML are listed separately on the admin page.
 
-- Одна тема; OCR нет — сканы без текстового слоя ingest отклоняет.
-- llm-gateway предполагается OpenAI-совместимым (`/chat/completions`). Для другого
-  протокола достаточно заменить `apps/api/src/rag/llm.service.ts`.
-- Ожидаемые документы в контрольных вопросах составлены по содержанию корпуса;
-  после первого прогона их стоит сверить вручную.
-- Ответы — пересказ документов на дату их редакции, а не правовая оценка случая.
+## Known limitations
+
+**Answer quality**
+
+- Answers come from a 9-billion-parameter local model, and its Russian and Ukrainian
+  are unreliable even when the sources are right. Seen in the runs above: the invented
+  word `образованиевый сертификат` for Bildungsgutschein; Sperrzeit translated into
+  Ukrainian as `спрощений період` ("simplified period"); and for "Will I get benefit if I
+  quit myself?" the answer "No, you will not get benefit" (`Нет, вы не получите пособие`), while the documents say the
+  benefit is suspended for a period (Sperrzeit) and reduces the entitlement. A stronger
+  model behind llm-gateway is expected to help; this has not been measured.
+- The code checks that every footnote points at an excerpt that was sent to the model.
+  It does not check that the sentence says what the excerpt says.
+- A footnote can point at a page that is only loosely related: in the Sperrzeit answer
+  above, footnote 1 led to a passage that is mainly about the Gründungszuschuss.
+
+**What the numbers mean**
+
+- The 20 control questions and their expected documents were written by the author from
+  the documents' content. No lawyer or Agentur für Arbeit staff member reviewed them.
+- A pass means the expected document was among the sources. It does not mean the answer
+  was correct.
+- q20 (duties of job seekers who get no benefit) fails in every run: the answer cites
+  Merkblatt 1 instead of the leaflet for job seekers without benefit.
+- Results vary between runs because the model rewrites the question differently: the
+  same setup gave 18/20 and 19/20 in two runs of the search check.
+- On a Mac with the local model an answer takes about 25 s (median), 32 s at the 90th
+  percentile.
+
+**Not verified**
+
+- llm-gateway is assumed to be OpenAI-compatible (`POST /chat/completions`) and has not
+  been tried. Another protocol needs a new [`llm.service.ts`](apps/api/src/rag/llm.service.ts).
+- No server deployment yet: Let's Encrypt, the `ollama` Compose profile and the Deploy
+  workflow have not run. CI has not run on GitHub yet.
+- The site through Caddy was checked with `curl`, not in a browser, because the browser
+  used does not trust Caddy's local CA. The same UI was checked in a browser without Caddy.
+
+**Corpus and text extraction**
+
+- One topic, 20 documents. Questions about Bürgergeld, Kindergeld, residence permits or
+  taxes are refused, not answered.
+- Scanned PDFs without a text layer are rejected; there is no OCR.
+- `pdf-parse` sometimes splits words (`Arbeits losengeld` in the sources panel). Such
+  words are missed by the German full-text search, and vector search has to cover them.
+- Page numbers are pages of the PDF file, not the numbers printed on the page.
+- File URLs change with every edition, and nothing checks for new editions; this is
+  manual.
+
+**Product**
+
+- Answers in Russian and Ukrainian only. A question in German finds the right documents,
+  but its language is detected as Russian and the answer is in Russian.
+- The admin page is in Russian only.
+- Earlier turns of a conversation are used to rewrite the question, not passed to the
+  answer model.
+- Every visitor gets a guest account in Postgres; old guest accounts are never deleted.
+- Rate limits are kept in memory per API process and reset on restart.
+- `/api/health` is public and shows the model names and the index size.
+
+## License
+
+[MIT](LICENSE)

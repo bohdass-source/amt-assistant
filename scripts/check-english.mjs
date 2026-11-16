@@ -28,10 +28,8 @@ const CONTENT_FILES = [
   /^apps\/api\/test\/offline\/fakes\.ts$/, // fixtures shared by the offline tests
 ];
 
-/** Not checked yet; each entry must name the change that removes it. */
-const PENDING = [
-  /^README\.md$/, // rewritten in English in the README commit
-];
+/** Not checked yet; each entry must name the change that removes it. Empty: everything is checked. */
+const PENDING = [];
 
 const SKIP = [/^package-lock\.json$/, /\.(png|jpe?g|gif|ico|pdf|woff2?)$/];
 
