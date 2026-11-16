@@ -1,5 +1,7 @@
 # amt-assistant
 
+[![CI](https://github.com/bohdass-source/amt-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/bohdass-source/amt-assistant/actions/workflows/ci.yml)
+
 Answers questions in **Russian and Ukrainian** about German **unemployment benefit
 (Arbeitslosengeld)** and **funded vocational training (Bildungsgutschein)**, using only
 official documents of the Bundesagentur für Arbeit. Every answer cites the document,
@@ -83,8 +85,11 @@ All live checks used `bge-m3` embeddings and `qwen3.5:9b` for the query rewrite 
 answers, through a local Ollama on a Mac. The control questions and the expected
 documents are in [`data/eval/questions.yaml`](data/eval/questions.yaml).
 
+CI on GitHub runs the English and link checks, typecheck, offline tests, the build, Compose
+validation and both Docker image builds on every push to `main`.
+
 Not checked yet: deployment to a server with a real domain and Let's Encrypt, the
-`ollama` Compose profile, the real llm-gateway, and the CI workflow on GitHub.
+`ollama` Compose profile and the real llm-gateway.
 
 ## How it works
 
@@ -355,7 +360,7 @@ the admin page. Documents removed from the YAML are listed separately on the adm
 - llm-gateway is assumed to be OpenAI-compatible (`POST /chat/completions`) and has not
   been tried. Another protocol needs a new [`llm.service.ts`](apps/api/src/rag/llm.service.ts).
 - No server deployment yet: Let's Encrypt, the `ollama` Compose profile and the Deploy
-  workflow have not run. CI has not run on GitHub yet.
+  workflow have not run.
 - The site through Caddy was checked with `curl`, not in a browser, because the browser
   used does not trust Caddy's local CA. The same UI was checked in a browser without Caddy.
 
