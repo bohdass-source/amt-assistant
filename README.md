@@ -38,6 +38,36 @@ of Merkblatt 6; the Russian wording has errors (for example the invented word
 |---|---|
 | <img src="docs/screenshots/chat-refusal-uk-mobile.png" alt="Refusal of a question about Kindergeld" width="300"> | <img src="docs/screenshots/sources.png" alt="List of the 20 source documents with edition dates" width="420"><br><img src="docs/screenshots/admin.png" alt="Admin page with ingest status of all documents" width="420"> |
 
+## Features
+
+- Questions in Russian or Ukrainian, answers in the same language
+- Corpus of 20 official documents (Bundesagentur für Arbeit leaflets and instructions, AZAV), listed with URL and edition date in one YAML file
+- Background ingest: PDF download, text per page, section-aware chunking, skip of unchanged files by SHA-256
+- Query rewrite into German with the conversation history, so follow-up questions work
+- Hybrid retrieval: vector search (Chroma, `bge-m3`) plus German full-text search (PostgreSQL), merged with reciprocal rank fusion
+- Refusal of off-topic questions and of questions without a close enough match
+- Answers only from the retrieved excerpts, with numbered footnotes checked by code
+- Every footnote links to the exact PDF page; every answer ends with the sources, their edition dates and a "not legal advice" note
+- Streaming answers (Server-Sent Events) with a sources panel
+- Guest sessions, user and admin roles, conversation history, answer ratings
+- Admin page: ingest status of every document, re-indexing, usage and negative ratings
+- `/api/search` endpoint without generation, plus a Python adapter for the rag-probe test bench
+- Docker Compose stack with HTTPS through Caddy, GitHub Actions CI
+
+## Tech stack
+
+| Layer | Technologies |
+|---|---|
+| Backend API | Node.js 22, TypeScript, NestJS 11, Zod (config and request validation), JWT auth, bcrypt, rate limiting (`@nestjs/throttler`) |
+| RAG pipeline | LangChain JS: `ChatOpenAI` for any OpenAI-compatible LLM gateway, `OllamaEmbeddings`, `RecursiveCharacterTextSplitter`; `pdf-parse` for text per page |
+| Models | Ollama; `bge-m3` (multilingual embeddings); `qwen3.5:9b` for the demo, a model behind llm-gateway in production |
+| Search and storage | ChromaDB 1.5 (vectors, cosine), PostgreSQL 16 (German full-text search with `tsvector`, users, history, ratings) |
+| Background jobs | Redis 7, BullMQ (ingest queue, separate worker process) |
+| Frontend | Next.js 15 (App Router, standalone build), React 19, streaming chat over SSE |
+| Infrastructure | Docker, Docker Compose, Caddy 2 (HTTPS with Let's Encrypt or a local CA) |
+| Quality | Vitest offline tests, live checks against a real model, GitHub Actions CI, English and link checks |
+| Integration | Python 3.10+ standard library adapter for rag-probe |
+
 ## What was checked, and how
 
 | What | How | Result |
@@ -88,6 +118,47 @@ waiting or running is ignored.
 **Answers** are streamed as Server-Sent Events: `meta → sources → token… → done`. The
 `done` event carries the checked text, which replaces the streamed one.
 
+### Where a question goes
+
+| Step | From → to | What happens |
+|---|---|---|
+| 1 | Browser → Caddy | HTTPS. Caddy sends `/api/*` to the API and everything else to the Next.js site |
+| 2 | Browser → API `/api/auth/guest` | First visit: an anonymous guest account and a JWT, so history and ratings work |
+| 3 | Browser → API `POST /api/chat` | The question opens a Server-Sent Events stream |
+| 4 | API → LLM | Rewrite: the question and the last 6 turns become `{lang, in_scope, query_de}` |
+| 5 | API → Ollama | `bge-m3` embedding of the German query |
+| 6 | API → Chroma and PostgreSQL | In parallel: top 20 by cosine similarity and top 20 by German full-text search |
+| 7 | API | Reciprocal rank fusion → 6 excerpts; refusal if off-topic, below the similarity threshold or the index is empty |
+| 8 | API → LLM | The 6 numbered excerpts and the question; tokens stream back |
+| 9 | API → browser | Events `meta` (language, German query), `sources` (excerpts), `token`… , `done` (checked text, cited sources, footer) |
+| 10 | API → PostgreSQL | Question, answer, citations, footer and refusal reason are stored; a rating is stored later |
+
+### How a document gets into the index
+
+| Step | Component | What happens |
+|---|---|---|
+| 1 | Admin page → API | "Load all from sources.yaml" or "Re-index" for one document |
+| 2 | API → Redis | One BullMQ job per document; a second request while it waits or runs is ignored |
+| 3 | Worker → agency website | Download the PDF (only files that start with `%PDF-`, up to 60 MB) |
+| 4 | Worker → PostgreSQL | SHA-256 compared with the last successful run; an unchanged file is skipped |
+| 5 | Worker | Text per page, running headers and footers removed, chunks by section, never across a page |
+| 6 | Worker → Ollama | `bge-m3` embedding of every chunk, with the document and section title for context |
+| 7 | Worker → Chroma | Old vectors of the document replaced by the new ones |
+| 8 | Worker → PostgreSQL | In one transaction: chunks with their `tsvector`, page count, hash, status `ready` |
+
+### Where data lives
+
+| Store | Contents |
+|---|---|
+| PostgreSQL | Users and roles, documents and ingest status, chunks with full-text index, conversations, messages with citations, ratings |
+| Chroma | One vector per chunk, with the chunk id, document id and page |
+| Redis | The ingest queue |
+| [`data/sources.yaml`](data/sources.yaml) | The list of documents: the only place to add or update one |
+| Ollama | The embedding model (and the LLM in the demo) |
+| Caddy volume | TLS certificates |
+
+### Components
+
 | Part | Role |
 |---|---|
 | [`apps/api`](apps/api) | NestJS 11: auth (admin/user, guest sessions), chat, `/api/search`, admin, ingest queue producer |
@@ -96,6 +167,37 @@ waiting or running is ignored.
 | [`data/sources.yaml`](data/sources.yaml) | The 20 documents: URL, edition, date the URL was checked |
 | [`integrations/rag-probe`](integrations/rag-probe/README.md) | HTTP adapter for the rag-probe test bench |
 | [`infra/Caddyfile`](infra/Caddyfile) | HTTPS (Let's Encrypt or a local CA), SSE without buffering |
+
+## Project structure
+
+```text
+amt-assistant/
+├── apps/
+│   ├── api/                      NestJS API and ingest worker
+│   │   ├── src/
+│   │   │   ├── auth/             guest sessions, login, roles
+│   │   │   ├── chat/             SSE chat, answer generation, history, ratings
+│   │   │   ├── rag/              query rewrite, embeddings, Chroma, full-text search, fusion, citation checks, prompts
+│   │   │   ├── ingest/           PDF text, chunker, BullMQ producer and worker
+│   │   │   ├── search/           /api/search for external evaluation
+│   │   │   ├── admin/            document status, re-index, stats
+│   │   │   ├── db/               PostgreSQL pool and migrations
+│   │   │   ├── live/             live checks against a running system
+│   │   │   ├── main.ts           API entry point
+│   │   │   └── worker.ts         worker entry point
+│   │   └── test/offline/         offline tests with fakes
+│   └── web/                      Next.js site: chat, sources page, admin page
+├── data/
+│   ├── sources.yaml              the 20 documents
+│   └── eval/questions.yaml       control questions
+├── docs/                         search API contract, screenshots
+├── infra/Caddyfile               HTTPS reverse proxy
+├── integrations/rag-probe/       Python adapter for the rag-probe test bench
+├── reports/live/                 live check reports
+├── scripts/                      English and link checks
+├── docker-compose.yml            full stack
+└── docker-compose.dev.yml        data stores for local development
+```
 
 ## Run it locally
 
