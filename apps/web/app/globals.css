@@ -674,8 +674,20 @@ textarea {
 }
 
 @media (max-width: 720px) {
+  /* The brand and the menu do not fit on one line at phone width: the menu wraps below. */
   .site-header {
     padding: 8px 16px;
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .brand strong {
+    white-space: nowrap;
+  }
+  .site-nav {
+    flex: 1 0 100%;
+  }
+  .lang-switch {
+    margin-left: auto;
   }
   .brand small {
     display: none;
