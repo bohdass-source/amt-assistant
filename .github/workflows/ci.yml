@@ -24,6 +24,8 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - name: English-only code and docs
         run: npm run check:english
+      - name: Links in Markdown point at tracked files
+        run: npm run check:links
       - name: Typecheck
         run: npm run typecheck
       # Offline tests use fakes and block the network. Live checks against a real
