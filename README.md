@@ -82,10 +82,26 @@ für Arbeit.
 
 ### Screens
 
-| Refusal of an off-topic question (Ukrainian, phone) | Documents the assistant answers from | Admin page |
-|---|---|---|
-| <img src="docs/screenshots/chat-refusal-uk-mobile.png" alt="Refusal of a question about Kindergeld" width="260"> | <img src="docs/screenshots/sources.png" alt="List of the 20 source documents with edition dates" width="320"> | <img src="docs/screenshots/admin.png" alt="Admin page with ingest status of all documents" width="320"> |
-| Question: "How much is Kindergeld for two children?" Answer: "I only answer questions about unemployment benefit (Arbeitslosengeld) and paying for vocational training (Bildungsgutschein, Weiterbildung) from official documents of the Bundesagentur für Arbeit. My documents have no answer to this question." | The 20 documents with publisher, edition date and page count. Text: "All documents are published by the Bundesagentur für Arbeit or on gesetze-im-internet.de. The agencies update them regularly, so check the edition date." | For the project owner: every document's ingest status, pages, chunks and file hash; re-index buttons; usage numbers and the latest negative ratings |
+**Refusal of an off-topic question** (Ukrainian, phone width). Question: "How much is
+Kindergeld for two children?" Answer: "I only answer questions about unemployment
+benefit (Arbeitslosengeld) and paying for vocational training (Bildungsgutschein,
+Weiterbildung) from official documents of the Bundesagentur für Arbeit. My documents
+have no answer to this question." The footer repeats the "not legal advice" note.
+
+<img src="docs/screenshots/chat-refusal-uk-mobile.png" alt="Refusal of a question about Kindergeld, in Ukrainian, at phone width" width="300">
+
+**Documents the assistant answers from.** All 20 documents with publisher, edition date
+and page count, each linked to the official PDF. The text says: "All documents are
+published by the Bundesagentur für Arbeit or on gesetze-im-internet.de. The agencies
+update them regularly, so check the edition date."
+
+![Sources page: the 20 documents with edition dates](docs/screenshots/sources.png)
+
+**Admin page** (for the project owner). Ingest status, pages, chunks and file hash of
+every document; buttons to load or re-index documents; below it, usage numbers and the
+latest negative ratings.
+
+![Admin page: ingest status of all documents](docs/screenshots/admin.png)
 
 ## Features
 
