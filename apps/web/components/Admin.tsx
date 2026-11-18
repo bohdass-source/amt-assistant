@@ -115,7 +115,7 @@ export function Admin() {
         <div>
           <h1>Corpus documents</h1>
           <p className="muted">
-            {ready} of {data?.documents.length ?? '…'} ready · queue: {data?.queue.waiting ?? 0} waiting, {data?.queue.active ?? 0} active,
+            {ready} of {data?.documents.length ?? '…'} ready · queue: {data?.queue.waiting ?? 0} waiting, {data?.queue.active ?? 0} active,{' '}
             {data?.queue.failed ?? 0} failed
           </p>
         </div>
@@ -170,7 +170,7 @@ export function Admin() {
                 <td>{d.chunks ?? '—'}</td>
                 <td className="mono small">{d.sha256 ? d.sha256.slice(0, 10) : '—'}</td>
                 <td>
-                  <button type="button" className="btn btn-small" disabled={busy} onClick={() => void run(`/admin/documents/${d.id}/ingest`, true)}>
+                  <button type="button" className="btn btn-small nowrap" disabled={busy} onClick={() => void run(`/admin/documents/${d.id}/ingest`, true)}>
                     Re-index
                   </button>
                 </td>
