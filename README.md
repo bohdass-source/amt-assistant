@@ -82,6 +82,40 @@ für Arbeit.
 
 ### Screens
 
+**A conversation in Ukrainian with a follow-up question.** The second question, "And if
+I am 58?", only makes sense together with the first one; the assistant rewrites it into a
+complete German query using the conversation history.
+
+![Ukrainian conversation: a question about the benefit duration and a follow-up about age 58](docs/screenshots/chat-followup-uk.png)
+
+<details>
+<summary><b>What the screenshot says, in English</b></summary>
+
+**Question 1:** How many months is unemployment benefit paid?
+
+**Answer 1** (translated literally): Proving (the model wrote `Доведення`, "proving",
+where "duration" was meant) the right to unemployment benefit (Arbeitslosengeld) depends
+on how long you were insured in the last 5 years [1]. The exact duration is given in the
+table in the document [1]. During supported retraining, the benefit is paid as long as
+the conditions for it are met [5]. During this period the entitlement shrinks: for every
+two days paid it is reduced by one day [5]. If 90 days or fewer were left before the
+retraining, there is no reduction at all [2]. If less than 90 days are left after the
+retraining, only this remaining period is paid [2]. The right to unemployment benefit
+expires 4 years after it arose [6].
+
+**Question 2:** And if I am 58?
+
+**Answer 2:** If you are 58, the maximum duration of your entitlement to unemployment
+benefit (Arbeitslosengeld) is 720 calendar days [1]. Source: Merkblatt 1, p. 35.
+
+</details>
+
+**Checking a footnote.** The link in the sources panel opens the official PDF on the cited
+page. Page 35 of Merkblatt 1 says *"ab 58 Jahren bis auf 720 Kalendertage"* ("from age
+58, up to 720 calendar days"), which is what the second answer above states.
+
+![The official PDF opened on page 35, the page cited by footnote 1](docs/screenshots/pdf-page.png)
+
 **Refusal of an off-topic question** (Ukrainian, phone width). Question: "How much is
 Kindergeld for two children?" Answer: "I only answer questions about unemployment
 benefit (Arbeitslosengeld) and paying for vocational training (Bildungsgutschein,
@@ -404,6 +438,9 @@ the admin page. Documents removed from the YAML are listed separately on the adm
   It does not check that the sentence says what the excerpt says.
 - A footnote can point at a page that is only loosely related: in the Sperrzeit answer
   above, footnote 1 led to a passage that is mainly about the Gründungszuschuss.
+- Answers do not always quote the key fact even when it is in an excerpt: asked how long
+  benefit is paid, the model said the duration "is given in the table in the document"
+  instead of giving the numbers (see the Ukrainian example in [Screens](#screens)).
 
 **What the numbers mean**
 
