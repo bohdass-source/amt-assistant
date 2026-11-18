@@ -231,7 +231,7 @@ docker compose up -d --build
 
 Open https://localhost. Caddy issues a certificate from its own local CA, so the browser
 shows a warning. The admin page is https://localhost/admin (log in with `ADMIN_EMAIL` /
-`ADMIN_PASSWORD`); press `Загрузить все из sources.yaml` to download and index the
+`ADMIN_PASSWORD`); press **Load all from sources.yaml** to download and index the
 20 documents.
 
 ### Option B: data stores in Docker, code with npm (for development)
@@ -323,7 +323,7 @@ Not done yet for this project; these are the intended steps.
 
 The agency renames its files (`…_baNNNNNN.pdf`) with every edition. If ingest fails with
 404, find the new link on the page given in the document's `page` field, update `url`
-and `date` in [`data/sources.yaml`](data/sources.yaml) and press `Переиндексировать` on
+and `date` in [`data/sources.yaml`](data/sources.yaml) and press **Re-index** on
 the admin page. Documents removed from the YAML are listed separately on the admin page.
 
 ## Known limitations
@@ -379,7 +379,7 @@ the admin page. Documents removed from the YAML are listed separately on the adm
 
 - Answers in Russian and Ukrainian only. A question in German finds the right documents,
   but its language is detected as Russian and the answer is in Russian.
-- The admin page is in Russian only.
+- The admin page is in English only; the chat for users is in Russian and Ukrainian.
 - Earlier turns of a conversation are used to rewrite the question, not passed to the
   answer model.
 - Every visitor gets a guest account in Postgres; old guest accounts are never deleted.

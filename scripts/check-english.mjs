@@ -19,9 +19,8 @@ const CONTENT_FILES = [
   /^apps\/api\/src\/rag\/i18n\.ts$/, // refusal texts and the disclaimer
   /^apps\/api\/src\/rag\/prompts\.ts$/, // example of the expected answer style
   /^apps\/web\/lib\/i18n\.tsx$/, // UI strings
-  /^apps\/web\/components\/Admin\.tsx$/, // admin UI, used by the project team in Russian
   /^apps\/web\/components\/Shell\.tsx$/, // bilingual label of the language switch
-  /^apps\/web\/app\/(layout|admin\/page|sources\/page)\.tsx$/, // page titles and meta description
+  /^apps\/web\/app\/(layout|sources\/page)\.tsx$/, // page titles and meta description
   /^data\/eval\/questions\.yaml$/, // control questions as users would type them
   /^reports\/live\/.+\.json$/, // live check reports quote those questions
   /\.test\.ts$/, // test fixtures

@@ -31,14 +31,14 @@ interface Stats {
 }
 
 const STATUS_LABEL: Record<AdminDocument['status'], string> = {
-  pending: 'не загружен',
-  queued: 'в очереди',
-  processing: 'обработка',
-  ready: 'готов',
-  failed: 'ошибка',
+  pending: 'not loaded',
+  queued: 'queued',
+  processing: 'processing',
+  ready: 'ready',
+  failed: 'failed',
 };
 
-/** The admin page is in Russian only: it is used by the project team, not by visitors. */
+/** The admin page is in English only: it is used by the project owner, not by visitors. */
 export function Admin() {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [data, setData] = useState<AdminData | null>(null);
@@ -71,7 +71,7 @@ export function Admin() {
     try {
       setUser(await login(email, password));
     } catch (err) {
-      setError(err instanceof ApiError && err.status === 401 ? 'Неверный email или пароль' : 'Ошибка входа');
+      setError(err instanceof ApiError && err.status === 401 ? 'Wrong email or password' : 'Login failed');
     }
   };
 
@@ -88,19 +88,19 @@ export function Admin() {
   if (!user || user.role !== 'admin') {
     return (
       <div className="page narrow">
-        <h1>Вход для администратора</h1>
+        <h1>Admin login</h1>
         <form className="login-form" onSubmit={onLogin}>
           <label>
             Email
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" required />
           </label>
           <label>
-            Пароль
+            Password
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
           </label>
           {error ? <p className="error">{error}</p> : null}
           <button type="submit" className="btn btn-primary">
-            Войти
+            Log in
           </button>
         </form>
       </div>
@@ -113,18 +113,18 @@ export function Admin() {
     <div className="page">
       <div className="page-head">
         <div>
-          <h1>Документы корпуса</h1>
+          <h1>Corpus documents</h1>
           <p className="muted">
-            Готово {ready} из {data?.documents.length ?? '…'} · очередь: ждут {data?.queue.waiting ?? 0}, в работе {data?.queue.active ?? 0},
-            ошибок {data?.queue.failed ?? 0}
+            {ready} of {data?.documents.length ?? '…'} ready · queue: {data?.queue.waiting ?? 0} waiting, {data?.queue.active ?? 0} active,
+            {data?.queue.failed ?? 0} failed
           </p>
         </div>
         <div className="actions">
           <button type="button" className="btn btn-primary" disabled={busy} onClick={() => void run('/admin/documents/sync')}>
-            Загрузить все из sources.yaml
+            Load all from sources.yaml
           </button>
           <button type="button" className="btn" disabled={busy} onClick={() => void run('/admin/documents/sync', true)}>
-            Переиндексировать всё
+            Re-index all
           </button>
           <button
             type="button"
@@ -134,7 +134,7 @@ export function Admin() {
               setUser(null);
             }}
           >
-            Выйти
+            Log out
           </button>
         </div>
       </div>
@@ -143,11 +143,11 @@ export function Admin() {
         <table className="doc-table">
           <thead>
             <tr>
-              <th>Документ</th>
-              <th>Редакция</th>
-              <th>Статус</th>
-              <th>Стр.</th>
-              <th>Фрагм.</th>
+              <th>Document</th>
+              <th>Edition</th>
+              <th>Status</th>
+              <th>Pages</th>
+              <th>Chunks</th>
               <th>SHA-256</th>
               <th />
             </tr>
@@ -171,7 +171,7 @@ export function Admin() {
                 <td className="mono small">{d.sha256 ? d.sha256.slice(0, 10) : '—'}</td>
                 <td>
                   <button type="button" className="btn btn-small" disabled={busy} onClick={() => void run(`/admin/documents/${d.id}/ingest`, true)}>
-                    Переиндексировать
+                    Re-index
                   </button>
                 </td>
               </tr>
@@ -180,20 +180,20 @@ export function Admin() {
         </table>
       </div>
       {data?.orphaned.length ? (
-        <p className="muted small">В базе есть документы, которых больше нет в sources.yaml: {data.orphaned.map((o) => o.id).join(', ')}</p>
+        <p className="muted small">The database has documents that are no longer in sources.yaml: {data.orphaned.map((o) => o.id).join(', ')}</p>
       ) : null}
 
       {stats ? (
         <section className="stats">
-          <h2>Использование и оценки</h2>
+          <h2>Usage and ratings</h2>
           <dl className="stat-grid">
             {Object.entries({
-              'Ответов': stats.totals.answers,
-              'Отказов': stats.totals.refusals,
+              Answers: stats.totals.answers,
+              Refusals: stats.totals.refusals,
               '👍': stats.totals.thumbs_up,
               '👎': stats.totals.thumbs_down,
-              'Диалогов': stats.totals.conversations,
-              'Гостей': stats.totals.guests,
+              Conversations: stats.totals.conversations,
+              Guests: stats.totals.guests,
             }).map(([k, v]) => (
               <div key={k}>
                 <dt>{k}</dt>
@@ -203,13 +203,13 @@ export function Admin() {
           </dl>
           {stats.negative.length ? (
             <>
-              <h3>Последние отрицательные оценки</h3>
+              <h3>Latest negative ratings</h3>
               <ul className="negative-list">
                 {stats.negative.map((n) => (
                   <li key={n.message_id}>
                     <strong>{n.question}</strong>
                     <p className="small">{n.answer.slice(0, 400)}</p>
-                    {n.comment ? <p className="small muted">Комментарий: {n.comment}</p> : null}
+                    {n.comment ? <p className="small muted">Comment: {n.comment}</p> : null}
                   </li>
                 ))}
               </ul>
