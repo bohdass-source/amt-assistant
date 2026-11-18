@@ -159,7 +159,7 @@ latest negative ratings.
 |---|---|
 | Backend API | Node.js 22, TypeScript, NestJS 11, Zod (config and request validation), JWT auth, bcrypt, rate limiting (`@nestjs/throttler`) |
 | RAG pipeline | LangChain JS: `ChatOpenAI` for any OpenAI-compatible LLM gateway, `OllamaEmbeddings`, `RecursiveCharacterTextSplitter`; `pdf-parse` for text per page |
-| Models | Ollama; `bge-m3` (multilingual embeddings); `qwen3.5:9b` for the demo, a model behind llm-gateway in production |
+| Models | Ollama; `bge-m3` (multilingual embeddings); `qwen3.5:9b` for the query rewrite and the answers. Any OpenAI-compatible endpoint can serve the answers instead |
 | Search and storage | ChromaDB 1.5 (vectors, cosine), PostgreSQL 16 (German full-text search with `tsvector`, users, history, ratings) |
 | Background jobs | Redis 7, BullMQ (ingest queue, separate worker process) |
 | Frontend | Next.js 15 (App Router, standalone build), React 19, streaming chat over SSE |
@@ -185,8 +185,8 @@ documents are in [`data/eval/questions.yaml`](data/eval/questions.yaml).
 CI on GitHub runs the English and link checks, typecheck, offline tests, the build, Compose
 validation and both Docker image builds on every push to `main`.
 
-Not checked yet: deployment to a server with a real domain and Let's Encrypt, the
-`ollama` Compose profile and the real llm-gateway.
+Not checked: deployment to a server with a real domain and Let's Encrypt, the `ollama`
+Compose profile, and LLM endpoints other than Ollama.
 
 ## Architecture
 
@@ -199,7 +199,7 @@ flowchart LR
   K --> F
   F --> T{Refusal checks<br/>topic, similarity}
   T -- refuse --> R[Refusal + note]
-  T -- answer --> G[llm-gateway: answer only<br/>from excerpts, footnotes n]
+  T -- answer --> G[LLM: answer only<br/>from excerpts, footnotes n]
   G --> C[Code checks footnotes:<br/>every n → an excerpt sent]
   C --> A[Answer + sources,<br/>pages, edition dates, note]
 ```
@@ -404,11 +404,13 @@ relative link and image in Markdown points at a tracked file).
 
 ## Deploying to a server
 
-Not done yet for this project; these are the intended steps.
+This is a portfolio project and is not deployed publicly. The stack is built to run on a
+server as follows; these steps have not been carried out on a real server.
 
 1. A server with Docker, an A record for the domain pointing at it, ports 80 and 443 open.
 2. Clone into `/opt/amt-assistant`, `cp .env.example .env`, set `DOMAIN`, the secrets
-   and `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL` of the llm-gateway.
+   and `LLM_BASE_URL` / `LLM_API_KEY` / `LLM_MODEL` of the LLM endpoint (Ollama's `/v1`
+   or any other OpenAI-compatible API).
 3. Embeddings: Ollama on the host (`OLLAMA_URL=http://host.docker.internal:11434`) or in
    Compose (`docker compose --profile ollama up -d`, `OLLAMA_URL=http://ollama:11434`,
    then `docker compose exec ollama ollama pull bge-m3`).
@@ -432,8 +434,8 @@ the admin page. Documents removed from the YAML are listed separately on the adm
   word `образованиевый сертификат` for Bildungsgutschein; Sperrzeit translated into
   Ukrainian as `спрощений період` ("simplified period"); and for "Will I get benefit if I
   quit myself?" the answer "No, you will not get benefit" (`Нет, вы не получите пособие`), while the documents say the
-  benefit is suspended for a period (Sperrzeit) and reduces the entitlement. A stronger
-  model behind llm-gateway is expected to help; this has not been measured.
+  benefit is suspended for a period (Sperrzeit) and reduces the entitlement. A larger
+  model is expected to help; this has not been measured.
 - The code checks that every footnote points at an excerpt that was sent to the model.
   It does not check that the sentence says what the excerpt says.
 - A footnote can point at a page that is only loosely related: in the Sperrzeit answer
@@ -457,10 +459,11 @@ the admin page. Documents removed from the YAML are listed separately on the adm
 
 **Not verified**
 
-- llm-gateway is assumed to be OpenAI-compatible (`POST /chat/completions`) and has not
-  been tried. Another protocol needs a new [`llm.service.ts`](apps/api/src/rag/llm.service.ts).
-- No server deployment yet: Let's Encrypt, the `ollama` Compose profile and the Deploy
-  workflow have not run.
+- Generation was only run through Ollama's OpenAI-compatible endpoint. Other
+  OpenAI-compatible APIs (`POST /chat/completions`) should work but were not tried; another
+  protocol needs a new [`llm.service.ts`](apps/api/src/rag/llm.service.ts).
+- No server deployment (by choice, for a portfolio project): Let's Encrypt, the `ollama`
+  Compose profile and the Deploy workflow have not run.
 - The site through Caddy was checked with `curl`, not in a browser, because the browser
   used does not trust Caddy's local CA. The same UI was checked in a browser without Caddy.
 
